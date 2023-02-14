@@ -1,0 +1,198 @@
+
+
+{% extends 'base.html.twig' %}
+
+{% block body %}
+    <section class="section-block page-section" id="internet">
+        <div class="col-left">
+            {% include 'title.html.twig' with {token: 'internet'} %}
+
+            <section class="section-block">
+                <h3 class="section-h3">
+                    Facebook.
+                    <a href="https://www.instagram.com/fairytalesinyoghourt/"
+                       target="_blank">Instagram.</a>
+                    <a href="https://fairytalesinyoghourt.bandcamp.com/"
+                       target="_blank">Bandcamp.</a><br />
+                    <a href="https://soundcloud.com/walkertakethatrangers/"
+                       target="_blank">Soundcloud.</a>
+                    <a href="https://www.youtube.com/channel/UC4xsGvlhhxKMYVjs3awyETw"
+                       target="_blank">Youtube.</a>
+                </h3>
+                <div class="section-content" style="text-align: center;">
+                    <div class="fb-page" data-href="https://www.facebook.com/fairytalesinyoghourt/" data-tabs=""
+                         data-small-header="false" data-adapt-container-width="true" data-hide-cover="false"
+                         data-show-facepile="true" data-width="450">
+                        <blockquote cite="https://www.facebook.com/fairytalesinyoghourt/"
+                                    class="fb-xfbml-parse-ignore">
+                            <a href="https://www.facebook.com/fairytalesinyoghourt/">Fairy Tales in Yoghourt</a>
+                        </blockquote>
+                    </div>
+                </div>
+            </section>
+        </div>
+
+        <div class="col-right" id="news">
+            {% include 'title.html.twig' with {token: 'news'} %}
+
+            <section class="section-block">
+                <h3 class="section-h3">{{ lang == 'fr' ? 'Me tenir informé des derniers évènements' : 'Subscribe to mailing-list.' }}</h3>
+                {# <h3 class="section-h3"><?php echo $lang == 'fr'
+                        //? 'Me tenir informé des nouveaux disques, nouveaux clips, nouveaux mugs etc, à l\'aide de formidables emails'
+                        ? 'Me tenir informé des derniers évènements'
+                        : 'Subscribe to mailing-list.' ?></h3> #}
+                <div class="section-content">
+                    <!-- Begin MailChimp Signup Form -->
+                    {% include 'main/newsletter_mailchimp.html.twig' %}
+                </div>
+            </section>
+        </div>
+    </section>
+
+    <section class="section-block no-bg page-section" id="listen">
+        {% include 'title.html.twig' with {token: 'listen'} %}
+
+        <div class="col-left">
+            <!-- hauteur album : 686px -->
+
+            <p> 🌹🦇🌪 𝑺𝑯𝑨𝑷𝑬 𝑴𝑰𝑺𝑻𝑨𝑲𝑬𝑺 🌪🦇🌹 <br/>Dispo depuis le 4 novembre &gt; <a href="https://fairytalesinyoghourt.bandcamp.com/album/shape-mistakes-lp">Précommandes vinyles</a></p>
+            <br/>
+
+            <iframe style="border: 0; width: 100%; height: 753px;" src="https://bandcamp.com/EmbeddedPlayer/album=3952136070/size=large/bgcol=ffffff/linkcol=0687f5/transparent=true/" seamless>
+                <a href="https://fairytalesinyoghourt.bandcamp.com/album/shape-mistakes-lp">Shape Mistakes (LP) by Fairy Tales In Yoghourt</a></iframe>
+        </div>
+        <div class="col-right">
+            <iframe style="border: 0; width: 100%; height: 120px;"
+                    src="https://bandcamp.com/EmbeddedPlayer/album=2100489194/size=large/bgcol=ffffff/linkcol=0687f5/tracklist=false/artwork=small/transparent=true/" seamless>
+                <a href="https://fairytalesinyoghourt.bandcamp.com/album/l-pop-e-dune-t-te-couronn-e">
+                    L&#39;Épopée d&#39;une Tête Couronnée by Fairy Tales In Yoghourt</a></iframe>
+            <br><br>
+            <hr/>
+            <br>
+            <iframe style="border: 0; width: 100%; height: 120px;"
+                    src="https://bandcamp.com/EmbeddedPlayer/album=3548499386/size=large/bgcol=ffffff/linkcol=0687f5/tracklist=false/artwork=small/transparent=true/"
+                    seamless><a
+                        href="http://fairytalesinyoghourt.bandcamp.com/album/couple-of-minds-the-films-and-the-songs-of-the-seas">Couple
+                    of Minds / The Films and the Songs of the Seas by Fairy Tales In Yoghourt</a></iframe>
+            <br><br>
+            <hr/>
+            <br>
+            <iframe style="border: 0; width: 100%; height: 120px;"
+                    src="https://bandcamp.com/EmbeddedPlayer/album=1651058818/size=large/bgcol=ffffff/linkcol=0687f5/tracklist=false/artwork=small/transparent=true/"
+                    seamless><a href="http://fairytalesinyoghourt.bandcamp.com/album/ep-09">EP 09 by Fairy Tales In
+                    Yoghourt</a></iframe>
+            <br><br>
+            <hr/>
+            <br>
+            <iframe style="border: 0; width: 100%; height: 120px;"
+                    src="https://bandcamp.com/EmbeddedPlayer/album=3164579561/size=large/artwork=small/bgcol=ffffff/linkcol=0687f5/tracklist=false/track=646982271/transparent=true/"
+                    seamless><a href="http://teenagebed.bandcamp.com/album/teenage-tales-and-souvenirs-split-ep">Teenage
+                    Tales And Souvenirs (Split EP) by Fairy Tales In Yoghourt</a></iframe>
+            <br><br>
+            <hr/>
+            <br>
+            <iframe style="border: 0; width: 100%; height: 120px;"
+                    src="https://bandcamp.com/EmbeddedPlayer/album=718126688/size=large/bgcol=ffffff/linkcol=0687f5/tracklist=false/artwork=small/transparent=true/"
+                    seamless><a href="http://fairytalesinyoghourt.bandcamp.com/album/demos-07-anthology-part-1">Demos
+                    &#39;07 - Anthology, part 1 by Fairy Tales In Yoghourt</a></iframe>
+        </div>
+    </section>
+
+    <div ></div>
+    <section class="section-block videos-block page-section" id="video">
+        {% include 'title.html.twig' with {token: 'video'} %}
+
+        <div class="section-content">
+            <div class="col-left">
+
+                <ul>
+                    <li class="video">
+                        <iframe style="text-align: center; width: 100%;" height="260"
+                                src="https://www.youtube.com/embed/swUeDyYk4CY" frameborder="0"
+                                allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+                                allowfullscreen></iframe>
+                        <p><em>Shape Mistakes</em> (Réal Aloïs Lecerf / FTIY)</p>
+                    </li>
+                    <li class="video">
+                        <iframe style="text-align: center; width: 100%;" height="260"
+                                src="https://www.youtube.com/embed/obHfWhfhfT0" frameborder="0"
+                                allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+                                allowfullscreen></iframe>
+                        <p><em>Les Valseuses</em></p>
+                    </li>
+                    <li class="video">
+                        <iframe style="text-align: center; width: 100%;" height="260"
+                                src="https://www.youtube.com/embed/a_kfLt-Ziko" frameborder="0"
+                                allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+                                allowfullscreen></iframe>
+                        <p><em>Tour de France</em> (Réal. Clovis Le Pivert)</p>
+                    </li>
+                    <li class="video">
+                        <iframe style="text-align: center; width: 100%;" height="260"
+                                src="https://www.youtube.com/embed/Q4Zr2R_M_14" frameborder="0"
+                                allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+                                allowfullscreen></iframe>
+                        <p><em>The Films and The Songs of the Seas</em> (Réal. Benjamin Ferré)</p>
+                    </li>
+
+                    <li class="video">
+                        <iframe style="text-align: center; width: 100%;" height="260"
+                                src="https://www.youtube.com/embed/r09-j46jTJM" frameborder="0"
+                                allowfullscreen></iframe>
+                        <p><em>Forever and for the Glory</em> (Réal. Olivier Le Tohic)</p>
+                    </li>
+                </ul>
+            </div>
+            <div class="col-right">
+                <ul>
+                    <li class="video">
+                        <iframe style="text-align: center; width: 100%;" height="260"
+                                src="https://www.youtube.com/embed/-KvdpOQqysM" frameborder="0"
+                                allow="accelerometer; autoplay; encrypted-media; gyroscope; picture-in-picture"
+                                allowfullscreen></iframe>
+                        <p><em>Christmas, Inc.</em> (Réal. FTIY)</p>
+                    </li>
+                    <li class="video">
+                        <iframe src="//player.vimeo.com/video/35054289" height="260"
+                                style="text-align: center; width: 100%;" frameborder="0"
+                                webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
+                        <p><em>Campers</em> / <em>Couple of Minds</em>, Live @ Ile de versailles - Nantes (Melos
+                            Nova)</p>
+                    </li>
+                    <li class="video">
+                        <iframe style="text-align: center; width: 100%;" height="260"
+                                src="https://www.youtube.com/embed/qA_sv9s-7Ks" frameborder="0"
+                                allowfullscreen></iframe>
+                        <p><em>Pencils and Troubles</em>, Live @ Barakason - Rezé</p>
+                    </li>
+                    <li class="video">
+                        <iframe src="https://player.vimeo.com/video/187730108?title=0&byline=0&portrait=0"
+                                style="text-align: center; width: 100%;" height="260" frameborder="0"
+                                webkitallowfullscreen mozallowfullscreen allowfullscreen></iframe>
+                        <p><em>Animals</em>, Live @ Pôle Etudiant - Nantes (Vlipp)</p>
+                    </li>
+
+                </ul>
+            </div>
+        </div>
+    </section>
+
+    <section class="section-block page-section" id="shows">
+        {% include 'title.html.twig' with {token: 'shows'} %}
+
+        <div class="section-content">
+            <!--script type='text/javascript' src='http://www.bandsintown.com/javascripts/bit_widget.js'></script>
+            <script type='text/javascript'>var widget = new BIT.Widget({"artist":"Fairy Tales in Yoghourt","prefix":"fbjs"});widget.insert_events();</script-->
+            <script charset="utf-8" src="https://widget.bandsintown.com/main.min.js"></script>
+            <a class="bit-widget-initializer" data-artist-name="Fairy Tales In Yoghourt"
+               data-display-local-dates="true"
+               data-display-past-dates="true" data-auto-style="false" data-text-color="#000000"
+               data-link-color="#2F95DE"
+               data-popup-background-color="#FFFFFF" data-background-color="#FFFFFF" data-display-limit="10"
+               data-link-text-color="#FFFFFF" data-language="<?php echo $lang ?>"></a>
+        </div>
+    </section>
+
+
+
+{% endblock %}

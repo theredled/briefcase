@@ -1,0 +1,75 @@
+@font-face {
+    font-family: "American Typewriter";
+    src: local('American Typewriter'), url('fonts/americantypewriter_1-webfont.ttf') format('truetype');
+}
+
+body {margin: 0px 0; padding: 0; font-family: "Helvetica Neue",Arial,sans-serif; /*font-family: Helvetica, sans-serif;*/ font-size: 13px;
+    background: no-repeat bottom center black;}
+* {margin: 0; padding: 0}
+#global {position: relative; width: 1000px; margin: 0 auto; }
+ul, li {list-style: none}
+
+#content {background: linear-gradient( 0deg, #aaa, #e7e7e7); /*background-color: #e7e7e7;*/ padding: 0; overflow: hidden}
+#header {background: #e7e7e7 no-repeat top center url(../images/Fusilli.jpg); text-indent: -1000px; background-size: 100%;
+    background-position: 0 -10px; height: 225px;}
+.section-block {margin: 0 0 30px 0; }
+.section-content {background: white; border: 1px solid #CCC; overflow: hidden;}
+a {color: black;}
+.no-bg {background: none}
+
+.col-left {width: 44%; padding: 10px 3% 10px 0; float: left; }
+.col-right {width: 52%; padding: 10px 0 10px 1%; float: left; }
+.video {padding: 5px 5px 10px}
+.video p {padding: 5px; color: #333}
+.video em {font-style: normal; font-weight: bold;}
+
+.section-h2 {padding-bottom: 10px; font-size: 26px; font-family: "American Typewriter",sans-serif; font-weight: bold}
+.section-h3 {padding-bottom: 10px; font-size: 16px; font-family: "American Typewriter",sans-serif; font-weight: bold;
+    line-height: 1.4;}
+.section-h2 .selected,
+.section-h3 .selected {display: inline; font-weight: bold; font-size: inherit}
+
+#footer {background-color: black; color: white; padding: 10px; font-size: 10px;
+    text-align:center;font-family: "American Typewriter",sans-serif;}
+#footer a {color:white}
+#footer p {margin: 1em 0}
+
+.section-h2 a {color: #888; text-decoration: none}
+.section-h3 a {color: #888; text-decoration: none}
+
+#mc_embed_signup .button {color: black !important}
+
+.page-section {clear: both; padding: 20px 2% 0 2%}
+.section-content .col-left,
+.section-content .col-right {width: 48.5%; padding: 10px 1% 10px 1%;}
+.section-content .col-left {padding-right: 0.5%}
+.section-content .col-right {padding-left: 0.5%}
+
+.header-nav {padding: 0.8em 2%; background: #bbb; display: block; border-bottom: 1px solid white}
+.header-nav .section-h2 {padding: 0; color: #888; text-decoration: underline}
+.header-nav .menu-item {margin-right: 2em; color: #555; text-transform: lowercase; font-weight: normal;
+    display: inline-block;}
+.header-nav .menu-item:first-of-type {text-transform: none;}
+.header-nav .menu-item:after {content: ',';}
+.header-nav .menu-item:last-of-type:after {content: '.';}
+.header-nav .menu-item:last-of-type {margin-right: 0}
+
+#downloads .section-content {padding: 3em; font-size: 15px}
+#downloads .section-content ul {display: flex}
+.file-item {text-align: center; width: 150px; padding: 0 25px; }
+.file-item a {text-decoration: none}
+.file-item .icon {font-size: 40px; display: block}
+.file-item .title {margin-top: 10px; display: block; font-weight: bold}
+.file-item .lang {font-size: 80%; }
+
+@media screen and (max-width: 975px) {
+    body {background: none}
+    #header {background-position: top right; }
+    #global {width: auto}
+    .col-right {width: auto!important; float: none; padding: 10px 2%!important;}
+    .col-left {width: auto!important; float: none; padding: 10px 2%!important;}
+}
+@media screen and (max-width: 488px) {
+    #header {height: 75px}
+
+}

@@ -1,0 +1,82 @@
+{% set menu = {
+    'listen': lang == 'fr' ? 'Écouter' : 'Listen',
+    'internet': lang == 'fr' ? 'Réseaux' : 'Internet',
+    'news': lang == 'fr' ? 'Newsletter' : 'Newsletter',
+    'video': lang == 'fr' ? 'Vidéos' : 'Videos',
+    'shows': lang == 'fr' ? 'Concerts' : 'Shows'
+} %}
+{% set selected_token = app.request.get('sel') %}
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <meta name="description"
+              content="Lazy perfectionism / mistake shaping / heavy folk / lonesome indie, since 2007, Nantes, France. Band member: Benoît Guchet."/>
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+
+        <title>{% block title %}Fairy Tales in Yoghourt{% endblock %}</title>
+        <link rel="icon" type="image/x-icon" href="{{ absolute_url('/favicon.ico') }}"/>
+
+        {# Run `composer require symfony/webpack-encore-bundle` to start using Symfony UX #}
+        {% block stylesheets %}
+            <link rel="stylesheet" href="/css/main.css?ver=7"/>
+            <link rel="stylesheet" href="/css/fontawesome-pro-5.12.0-web/css/all.css"/>
+
+            {{ encore_entry_link_tags('app') }}
+        {% endblock %}
+
+        {% block javascripts %}
+            {{ encore_entry_script_tags('app') }}
+            <!-- Google tag (gtag.js) -->
+            <script async src="https://www.googletagmanager.com/gtag/js?id=UA-44949233-1"></script>
+            <script>
+              window.dataLayer = window.dataLayer || [];
+              function gtag(){dataLayer.push(arguments);}
+              gtag('js', new Date());
+
+              gtag('config', 'UA-44949233-1');
+            </script>
+        {% endblock %}
+    </head>
+    <body>
+        <div id="fb-root"></div>
+
+        <script>(function (d, s, id) {
+                var js, fjs = d.getElementsByTagName(s)[0];
+                if (d.getElementById(id)) return;
+                js = d.createElement(s);
+                js.id = id;
+                js.src = "//connect.facebook.net/fr_FR/sdk.js#xfbml=1&version=v2.9";
+                fjs.parentNode.insertBefore(js, fjs);
+            }(document, 'script', 'facebook-jssdk'));</script>
+
+        <div id="global">
+
+            <div id="header">
+                <h1>Fairy Tales in Yoghourt</h1>
+            </div>
+            <nav class="header-nav">
+                {% include 'menu.html.twig' %}
+            </nav>
+            <div id="content">
+
+            {% block body %}{% endblock %}
+            </div>
+
+            <section id="footer">
+                <p>
+                    <span>Contact : ftiymusic [at] gmail.com<span>
+                    - <a href="http://fairytalesinyoghourt.bandcamp.com">Bandcamp</a>
+                    - <a href="https://soundcloud.com/walkertakethatrangers">Soundcloud</a>
+                    - <a href="https://www.facebook.com/FairyTalesInYoghourt/">Facebook</a>
+                </p>
+                <p>
+                    <a href="https://www.facebook.com/ClasseMannequin">Classe Mannequin</a>
+                    - <a href="https://www.facebook.com/BantamLyons/">Bantam Lyons</a>
+                    - <a href="https://www.facebook.com/BlondNeilYoung/">Blond Neil Young</a>
+                    - <a href="https://www.facebook.com/alvonstramm/">Al Von Stramm</a>
+                </p>
+            </section>
+        </div>
+    </body>
+</html>

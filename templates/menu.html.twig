@@ -1,0 +1,16 @@
+
+<div class="section-h2">
+    {% for token, label  in menu -%}
+        {%- if token == selected_token -%}
+            <h2 class="selected menu-item">
+        {%- else -%}
+            <a href="#{{ token }}" class="menu-item">
+        {%- endif -%}
+        {{- label -}}
+        {%- if token == selected_token -%}
+            </h2>
+        {%- else -%}
+            </a>
+        {%- endif -%}
+    {%- endfor -%}
+</div>
