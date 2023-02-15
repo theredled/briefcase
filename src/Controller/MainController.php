@@ -87,6 +87,8 @@ class MainController extends AbstractController
                 unlink($zipPath);
             if ($ret = $zip->open($zipPath, \ZipArchive::CREATE) !== true)
                 throw new \Exception('Erreur Zip : '.$ret.', '.$zip->getStatusString());
+            if (!count($files))
+                throw new \Exception('No files in '.$path);
             foreach ($files as $file)
                 $zip->addFile($file, basename($file));
             $zip->close();
