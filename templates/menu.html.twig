@@ -4,7 +4,7 @@
         {%- if token == selected_token -%}
             <h2 class="selected menu-item">
         {%- else -%}
-            <a href="#{{ token }}" class="menu-item">
+            <a href="{{ path('home') }}#{{ token }}" class="menu-item">
         {%- endif -%}
         {{- label -}}
         {%- if token == selected_token -%}
@@ -13,4 +13,5 @@
             </a>
         {%- endif -%}
     {%- endfor -%}
+    <a href="{{ path('dl_index') }}" class="menu-item">téléchargements</a>
 </div>
