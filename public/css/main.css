@@ -62,6 +62,8 @@ a {color: black;}
 .file-item .title {margin-top: 10px; display: block; font-weight: bold}
 .file-item .lang {font-size: 80%; }
 
+.text-block {margin-top: 3em}
+
 @media screen and (max-width: 975px) {
     body {background: none}
     #header {background-position: top right; }
