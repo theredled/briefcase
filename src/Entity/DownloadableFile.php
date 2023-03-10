@@ -30,6 +30,11 @@ class DownloadableFile
     #[ORM\OneToMany(mappedBy: 'File', targetEntity: Download::class)]
     private Collection $Downloads;
 
+    public function __toString()
+    {
+        return $this->getName();
+    }
+
     public function __construct()
     {
         $this->Downloads = new ArrayCollection();

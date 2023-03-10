@@ -2,6 +2,7 @@
 
 namespace App\Controller\Admin;
 
+use App\Entity\Download;
 use App\Entity\DownloadableFile;
 use App\Entity\Video;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
@@ -47,6 +48,6 @@ class DashboardController extends AbstractDashboardController
         yield MenuItem::linkToDashboard('Dashboard', 'fa fa-home');
         yield MenuItem::linkToCrud('Vidéos', 'fas fa-video', Video::class);
         yield MenuItem::linkToCrud('Fichiers', 'fas fa-file', DownloadableFile::class);
-
+        yield MenuItem::linkToCrud('Téléchargements', 'fas fa-download', Download::class);
     }
 }
