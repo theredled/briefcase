@@ -55,7 +55,7 @@ class MainController extends AbstractController
         $em->persist($dl);
         $em->flush();
 
-        return new BinaryFileResponse($path, contentDisposition: 'attachment');
+        return new BinaryFileResponse($path, contentDisposition: 'attachment', autoLastModified: false);
     }
 
     #[Route('/dl/', name: 'dl_index')]

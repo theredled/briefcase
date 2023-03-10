@@ -40,4 +40,8 @@ class DownloadCrudController extends AbstractCrudController
             ->add(Crud::PAGE_INDEX, Action::DETAIL)
             ;
     }
+
+    public function configureCrud(Crud $crud): Crud {
+        return $crud->setDefaultSort(['id' => 'DESC']);
+    }
 }
