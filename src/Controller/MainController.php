@@ -105,6 +105,8 @@ class MainController extends AbstractController
         $fileEntity = $doctrine->getRepository(DownloadableFile::class)->findOneBy(['token' => $token, 'lang' => $lang]);
         if (!$fileEntity)
             $fileEntity = $doctrine->getRepository(DownloadableFile::class)->findOneBy(['token' => $token]);
+        if (!$fileEntity)
+            return $this->redirectToRoute('dl_index');
 
         $dirname = $token.'_'.$fileEntity->getLang();
         $path = $this->getParameter('web_dir').'/dl/'.$dirname;
