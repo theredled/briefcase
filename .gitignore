@@ -8,4 +8,5 @@
 /var/cache/
 /var/log/
 /vendor/
+/var/data.db
 ###< symfony/framework-bundle ###

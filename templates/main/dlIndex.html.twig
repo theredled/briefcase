@@ -11,20 +11,13 @@
             <ul>
             {% for item in items %}
                 <li class="file-item">
-                    <a href="{{ path('dl_item', {token: item.token}) }}">
-                        <i class="far fa-file-pdf icon"></i>
+                    <a href="{{ path(item.isFolder ? 'dl_folder' : 'dl_item', {token: item.token}) }}">
+                        <i class="far {{ item.isFolder ? 'fa-archive' : 'fa-file-pdf' }} icon"></i>
                         <span class="title">{{ item.name }}</span>
                         <span class="lang">{{ item.lang ? '(' ~ item.lang|upper ~ ')' }}</span>
                     </a>
                 </li>
             {% endfor %}
-                <li class="file-item">
-                    <a href="{{ path('fullpresskit') }}">
-                        <i class="far fa-archive icon"></i>
-                        <span class="title">Dossier de presse détaillé</span>
-                        <span class="lang">(FR)</span>
-                    </a>
-                </li>
             </ul>
             <p class="text-block">Pour obtenir les fichiers sons, contacter
                 <em>ftiymusic [at] gmail.com</em>

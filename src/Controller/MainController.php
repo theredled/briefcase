@@ -74,8 +74,39 @@ class MainController extends AbstractController
     #[Route('/fullPressKit', name: 'fullpresskit')]
     public function fullPressKit(Request $request, Filesystem $filesystem): Response
     {
-        $lang = $this->getLang($request, ['fr']);
+        return $this->redirectToRoute('dl_folder', ['token' => 'fullpresskit']);
+        /*$lang = $this->getLang($request, ['fr']);
         $dirname = 'full_press_kit_'.$lang;
+        $path = $this->getParameter('web_dir').'/dl/'.$dirname;
+        $files = glob($path.'/*.*');
+        $filesystem->mkdir($this->getParameter('zip_cache_dir'));
+        $zipPath = $this->getParameter('zip_cache_dir').'/'.$dirname.'.zip';
+
+        if (!is_file($zipPath) or $this->getLastModificationTimeInFiles($files) > filemtime($zipPath)) {
+            $zip = new \ZipArchive();
+            if (is_file($zipPath))
+                unlink($zipPath);
+            if ($ret = $zip->open($zipPath, \ZipArchive::CREATE) !== true)
+                throw new \Exception('Erreur Zip : '.$ret.', '.$zip->getStatusString());
+            if (!count($files))
+                throw new \Exception('No files in '.$path);
+            foreach ($files as $file)
+                $zip->addFile($file, basename($file));
+            $zip->close();
+        }
+
+        return new BinaryFileResponse($zipPath);*/
+    }
+    #[Route('/dlFolder/{token}', name: 'dl_folder')]
+    public function dlFolder($token, Request $request, Filesystem $filesystem, ManagerRegistry $doctrine): Response
+    {
+        $lang = $this->getLang($request, ['fr']);
+
+        $fileEntity = $doctrine->getRepository(DownloadableFile::class)->findOneBy(['token' => $token, 'lang' => $lang]);
+        if (!$fileEntity)
+            $fileEntity = $doctrine->getRepository(DownloadableFile::class)->findOneBy(['token' => $token]);
+
+        $dirname = $token.'_'.$fileEntity->getLang();
         $path = $this->getParameter('web_dir').'/dl/'.$dirname;
         $files = glob($path.'/*.*');
         $filesystem->mkdir($this->getParameter('zip_cache_dir'));

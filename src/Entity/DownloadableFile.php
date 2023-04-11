@@ -30,6 +30,9 @@ class DownloadableFile
     #[ORM\OneToMany(mappedBy: 'File', targetEntity: Download::class)]
     private Collection $Downloads;
 
+    #[ORM\Column(nullable: true)]
+    private ?bool $isFolder = false;
+
     public function __toString()
     {
         return $this->getName();
@@ -38,6 +41,7 @@ class DownloadableFile
     public function __construct()
     {
         $this->Downloads = new ArrayCollection();
+        $this->isFolder = false;
     }
 
     public function getId(): ?int
@@ -127,6 +131,18 @@ class DownloadableFile
                 $download->setFile(null);
             }
         }
+
+        return $this;
+    }
+
+    public function isIsFolder(): ?bool
+    {
+        return $this->isFolder;
+    }
+
+    public function setIsFolder(bool $isFolder): self
+    {
+        $this->isFolder = $isFolder;
 
         return $this;
     }
