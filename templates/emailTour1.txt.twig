@@ -1,0 +1,32 @@
+Bonjour {{ nom }},
+
+{% if source %}
+    {% if dpd %}
+        Je vous écris sous les conseils avisés de {{ source }}.
+    {% else %}
+        J'ai eu votre contact par {{ source }}.
+    {% endif %}
+{% endif %}
+
+Voilà je mène un projet solo qui s'appelle Fairy Tales in Yoghourt, j'ai sorti un LP en novembre dernier et je suis en train de caler des tournée vers la Belgique à l'automne et début décembre.
+
+C'est une sorte de folk-rock assez barré, peut-être un genre de Neil Young lunaire perdu dans les disques d'un Steve Reich saoul.
+
+Voilà une session live en solo : https://www.youtube.com/watch?v=lrKnU8ZjwPs
+Tous les liens vers disque et clips : https://linktr.ee/fairytalesinyoghourt
+Et le dossier de presse au cas où : https://fairytalesinyoghourt.fun/dl/presskit
+
+{% if 'groupe' in formule %}
+Je tourne habituellement en solo, mais cette fois ce sera de préférence en groupe à 4, donc un peu plus rock que la session live ci-dessus évidemment.
+{% elseif 'solo' in formule %}
+
+{% else %}
+La tournée de décembre sera de préférence en groupe à 4, donc un peu plus rock que la session live ci-dessus évidemment.
+La tournée d'automne sera elle en solo comme dit plus haut.
+{% endif %}
+
+Est-ce que ça pourrait vous intéresser ?
+
+Merci beaucoup !
+À bientôt j'espère
+Benoît

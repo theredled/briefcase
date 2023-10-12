@@ -12,7 +12,7 @@
             {% for item in items %}
                 <li class="file-item">
                     <a href="{{ path(item.isFolder ? 'dl_folder' : 'dl_item', {token: item.token, lang: item.lang}) }}">
-                        <i class="far {{ item.isFolder ? 'fa-archive' : 'fa-file-pdf' }} icon"></i>
+                        <i class="far {{ item.faCssClass }} icon"></i>
                         <span class="title">{{ item.name }}</span>
                         <span class="lang">{{ item.lang ? '(' ~ item.lang|upper ~ ')' }}</span>
                     </a>

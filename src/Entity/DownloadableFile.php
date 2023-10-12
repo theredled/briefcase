@@ -33,6 +33,7 @@ class DownloadableFile
     #[ORM\Column(nullable: true)]
     private ?bool $isFolder = false;
 
+
     public function __toString()
     {
         return $this->getName();
@@ -135,7 +136,7 @@ class DownloadableFile
         return $this;
     }
 
-    public function isIsFolder(): ?bool
+    public function isFolder(): ?bool
     {
         return $this->isFolder;
     }

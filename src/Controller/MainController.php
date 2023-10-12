@@ -10,6 +10,7 @@ use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Mime\MimeTypes;
 use Symfony\Component\Routing\Annotation\Route;
 
 class MainController extends AbstractController
@@ -65,10 +66,45 @@ class MainController extends AbstractController
 
         $fileEntities = $doctrine->getRepository(DownloadableFile::class)->findAll();
 
+        foreach ($fileEntities as $item) {
+            $item->faCssClass = $this->getFaCssClass($item);
+        }
+
         return $this->render('main/dlIndex.html.twig', [
             'lang' => $request->getPreferredLanguage(['fr', 'en']),
             'items' => $fileEntities,
         ]);
+    }
+
+    public function getFaCssClass(DownloadableFile $fileEntity)
+    {
+        $defaultClass = 'fa-file-alt';
+
+        if ($fileEntity->isFolder())
+            return 'fa-file-archive';
+
+        $absPath = $this->getParameter('project_dir').'/'.$fileEntity->getRelativePath();
+        $fileEntity->mimeType = mime_content_type($absPath);
+
+        if (!$fileEntity->mimeType)
+            return $defaultClass;
+
+        if ($fileEntity->mimeType == 'application/pdf')
+            return 'fa-file-pdf';
+
+        $mimePrefix = explode('/', $fileEntity->mimeType)[0];
+
+        $mimePrefixesToClasses = [
+            'image' => 'fa-file-image',
+            'text' => 'fa-file-alt',
+            'video' => 'fa-file-video',
+            'audio' => 'fa-file-audio',
+        ];
+
+        if (isset($mimePrefixesToClasses[$mimePrefix]))
+            return $mimePrefixesToClasses[$mimePrefix];
+
+        return $defaultClass;
     }
 
     #[Route('/fullPressKit', name: 'fullpresskit')]
@@ -138,5 +174,10 @@ class MainController extends AbstractController
                 $lastTime = filemtime($file);
 
         return $lastTime;
+    }
+
+    public function writeEmailFromTemplate(Request $request)
+    {
+
     }
 }
