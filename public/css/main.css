@@ -47,7 +47,7 @@ a {color: black;}
 
 .header-nav {padding: 0.8em 2%; background: #bbb; display: block; border-bottom: 1px solid white}
 .header-nav .section-h2 {padding: 0; color: #888; text-decoration: underline; justify-content: space-between;
-    display: flex}
+    display: flex; flex-wrap: wrap;}
 .header-nav .menu-item { color: #555; text-transform: lowercase; font-weight: normal;}
 .header-nav .menu-item:first-of-type {text-transform: none;}
 .header-nav .menu-item:after {content: ',';}
