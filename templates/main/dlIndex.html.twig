@@ -11,7 +11,7 @@
             <ul>
             {% for item in items %}
                 <li class="file-item">
-                    <a href="{{ path(item.isFolder ? 'dl_folder' : 'dl_item', {token: item.token, lang: item.lang}) }}">
+                    <a href="{{ path(item.isFolder ? 'dl_folder_lang' : 'dl_item_lang', {token: item.token, lang: item.lang}) }}">
                         <i class="far {{ item.faCssClass }} icon"></i>
                         <span class="title">{{ item.name }}</span>
                         <span class="lang">{{ item.lang ? '(' ~ item.lang|upper ~ ')' }}</span>

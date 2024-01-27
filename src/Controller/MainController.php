@@ -33,6 +33,7 @@ class MainController extends AbstractController
             return $available[0];
     }
 
+    #[Route('/dl/{lang}/{token}', name: 'dl_item_lang')]
     #[Route('/dl/{token}', name: 'dl_item')]
     public function dlItem($token, Request $request, ManagerRegistry $doctrine): Response
     {
@@ -127,6 +128,7 @@ class MainController extends AbstractController
     }
 
     #[Route('/dlFolder/{token}', name: 'dl_folder')]
+    #[Route('/dlFolder/{lang}/{token}', name: 'dl_folder_lang')]
     public function dlFolder($token, Request $request, Filesystem $filesystem, ManagerRegistry $doctrine): Response
     {
         $lang = $this->getLang($request, ['fr']);
