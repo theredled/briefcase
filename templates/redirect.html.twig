@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+
+        <title>{% block title %}Fairy Tales in Yoghourt{% endblock %}</title>
+        <link rel="icon" type="image/x-icon" href="{{ absolute_url('/favicon.ico') }}"/>
+
+        {% block meta_refresh %}
+            <meta http-equiv="Refresh" content="0; url='{% block redirect_url %}{% endblock %}'" />
+        {% endblock %}
+
+    </head>
+    <body>
+
+    </body>
+</html>

@@ -45,18 +45,31 @@ class MainController extends AbstractController
             return $this->redirectToRoute('dl_index');
             //throw $this->createAccessDeniedException('Type de fichier non trouvé : '.$token);
 
-        $path = $this->getParameter('project_dir').'/'.$fileEntity->getRelativePath();
 
-        $dl = new Download();
-        $dl->setFile($fileEntity);
-        $dl->setDate(new \DateTime());
-        $dl->setIp($request->getClientIp());
-        $dl->setInfos(json_encode($request->headers->all(), true));
-        $em = $doctrine->getManager();
-        $em->persist($dl);
-        $em->flush();
+        if ($request->get('dl')) {
 
-        return new BinaryFileResponse($path, contentDisposition: 'attachment', autoLastModified: false);
+            #var_dump(__METHOD__, 'dl', $request->get('dl'));exit;
+            $path = $this->getParameter('project_dir') . '/' . $fileEntity->getRelativePath();
+
+            $dl = new Download();
+            $dl->setFile($fileEntity);
+            $dl->setDate(new \DateTime());
+            $dl->setIp($request->getClientIp());
+            $dl->setInfos(json_encode($request->headers->all(), true));
+            $em = $doctrine->getManager();
+            $em->persist($dl);
+            $em->flush();
+
+            return new BinaryFileResponse($path, contentDisposition: 'attachment', autoLastModified: false);
+        }
+        else {
+            #var_dump(__METHOD__, 'preview');
+
+            return $this->render('main/dlPreview.html.twig', [
+                'item' => $fileEntity,
+                'do_redirect' => true
+            ]);
+        }
     }
 
     #[Route('/dl/', name: 'dl_index')]
