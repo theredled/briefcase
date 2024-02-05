@@ -2,7 +2,7 @@
 
 {% block title %}{{ item.name }} - téléchargement{% endblock %}
 
-{% block redirect_url %}?dl=1{% endblock %}
+{% block redirect_url %}{{ dl_url }}{% endblock %}
 
 {% block meta_refresh %}
     {% if do_redirect %}

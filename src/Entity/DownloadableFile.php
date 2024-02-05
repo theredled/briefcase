@@ -33,6 +33,8 @@ class DownloadableFile
     #[ORM\Column(nullable: true)]
     private ?bool $isFolder = false;
 
+    #[ORM\Column(nullable: true)]
+    private ?bool $sensible = false;
 
     public function __toString()
     {
@@ -42,7 +44,6 @@ class DownloadableFile
     public function __construct()
     {
         $this->Downloads = new ArrayCollection();
-        $this->isFolder = false;
     }
 
     public function getId(): ?int
@@ -145,6 +146,17 @@ class DownloadableFile
     {
         $this->isFolder = $isFolder;
 
+        return $this;
+    }
+
+    public function getSensible()
+    {
+        return $this->sensible;
+    }
+
+    public function setSensible(bool $sensible = null)
+    {
+        $this->sensible = $sensible;
         return $this;
     }
 }

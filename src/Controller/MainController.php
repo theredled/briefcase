@@ -4,7 +4,9 @@ namespace App\Controller;
 
 use App\Entity\Download;
 use App\Entity\DownloadableFile;
+use CoopTilleuls\UrlSignerBundle\UrlSigner\UrlSignerInterface;
 use Doctrine\Persistence\ManagerRegistry;
+use Spatie\UrlSigner\Support\Url;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
@@ -35,7 +37,9 @@ class MainController extends AbstractController
 
     #[Route('/dl/{lang}/{token}', name: 'dl_item_lang')]
     #[Route('/dl/{token}', name: 'dl_item')]
-    public function dlItem($token, Request $request, ManagerRegistry $doctrine): Response
+    #[Route('/do_dl_signed/{token}', name: 'do_dl_signed', defaults: ['dl' => 1, '_signed' => true])]
+    #[Route('/dl_signed/{token}', name: 'dl_item_signed', defaults: ['_signed' => true])]
+    public function dlItem($token, Request $request, ManagerRegistry $doctrine, UrlSignerInterface $urlSigner): Response
     {
         $lang = $this->getLang($request);
 
@@ -43,8 +47,11 @@ class MainController extends AbstractController
         if (!$fileEntity)
             $fileEntity = $doctrine->getRepository(DownloadableFile::class)->findOneBy(['token' => $token]);
         if (!$fileEntity)
-            return $this->redirectToRoute('dl_index');
-            //throw $this->createAccessDeniedException('Type de fichier non trouvé : '.$token);
+            //return $this->redirectToRoute('dl_index');
+            throw $this->createAccessDeniedException('Fichier non trouvé : '.$token);
+        if ($fileEntity->getSensible() and !$request->get('_signed')) {
+            throw $this->createAccessDeniedException('Lien expiré : '.$token);
+        }
 
 
         if ($request->get('dl')) {
@@ -68,6 +75,10 @@ class MainController extends AbstractController
 
             return $this->render('main/dlPreview.html.twig', [
                 'item' => $fileEntity,
+                //'dl_url' => Url::addQueryParameters($request->getRequestUri(), ['dl' => 1]),
+                'dl_url' => $request->get('_signed')
+                    ? $urlSigner->sign($this->generateUrl('do_dl_signed', ['token' => $token]))
+                    : '?dl=1',
                 'do_redirect' => true
             ]);
         }
@@ -78,7 +89,7 @@ class MainController extends AbstractController
     {
         $lang = $this->getLang($request);
 
-        $fileEntities = $doctrine->getRepository(DownloadableFile::class)->findAll();
+        $fileEntities = $doctrine->getRepository(DownloadableFile::class)->findNotSensible();
 
         foreach ($fileEntities as $item) {
             $item->faCssClass = $this->getFaCssClass($item);

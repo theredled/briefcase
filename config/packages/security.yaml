@@ -8,7 +8,6 @@ security:
             memory:
                 users:
                     admin:
-                        # ftiy
                         password: $2y$13$qc8KETgkSeJcFHWnWxKcKO.IDEgpxf84wzWe1d4ZmwmxU93apyEZe
                         roles: ['ROLE_ADMIN']
     firewalls:

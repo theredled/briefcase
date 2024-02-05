@@ -30,6 +30,12 @@ class DownloadableFileRepository extends ServiceEntityRepository
         }
     }
 
+    public function findNotSensible()
+    {
+        $qb = $this->createQueryBuilder('i')->andWhere('i.sensible = FALSE OR i.sensible IS NULL');
+        return $qb->getQuery()->getResult();
+    }
+
     public function remove(DownloadableFile $entity, bool $flush = false): void
     {
         $this->getEntityManager()->remove($entity);

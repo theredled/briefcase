@@ -19,7 +19,8 @@
         "symfony/mime": "6.2.*",
         "symfony/password-hasher": "6.2.*",
         "symfony/runtime": "6.2.*",
-        "symfony/yaml": "6.2.*"
+        "symfony/yaml": "6.2.*",
+        "tilleuls/url-signer-bundle": "^2.2"
     },
     "config": {
         "allow-plugins": {
