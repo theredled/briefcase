@@ -27,6 +27,11 @@ class DownloadableFileCrudController extends AbstractCrudController
         return DownloadableFile::class;
     }
 
+    public function configureCrud(Crud $crud): Crud
+    {
+        return $crud->setDefaultSort(['sensible' => 'DESC', 'token' => 'ASC']);
+    }
+
     public function configureFields(string $pageName): iterable
     {
         return [
