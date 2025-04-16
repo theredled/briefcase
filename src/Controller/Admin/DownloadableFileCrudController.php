@@ -10,6 +10,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ChoiceField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\DateTimeField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ImageField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
@@ -38,9 +39,10 @@ class DownloadableFileCrudController extends AbstractCrudController
             TextField::new('token'),
             TextField::new('name'),
             ChoiceField::new('lang')->setChoices(['FR' => 'fr', 'EN' => 'en']),
-            ImageField::new('filename')->setUploadDir(DownloadableFile::getUploadDir()),
+            ImageField::new('filename')->setUploadDir(DownloadableFile::getUploadDir())->hideOnIndex(),
             BooleanField::new('isFolder'),
-            BooleanField::new('sensible')
+            BooleanField::new('sensible'),
+            DateTimeField::new('creationdate')
         ];
     }
 
