@@ -17,7 +17,11 @@ use Symfony\Component\Routing\Annotation\Route;
 
 class MainController extends AbstractController
 {
-    #[Route('/', name: 'home')]
+
+    #[Route('/',
+        name: 'home',
+         condition: 'request.getHttpHost() != "cv-benoit-guchet.fairyfiles.ovh"'
+    )]
     public function index(Request $request): Response
     {
         return $this->render('main/index.html.twig', [
@@ -35,6 +39,7 @@ class MainController extends AbstractController
             return $available[0];
     }
 
+    #[Route('/', name: 'dl_cv', defaults: ['token' => 'cv_dev', 'dl' => 1,'inline' => 1], host: 'cv-benoit-guchet.fairyfiles.ovh')]
     #[Route('/dl/{lang}/{token}', name: 'dl_item_lang')]
     #[Route('/dl/{token}', name: 'dl_item')]
     #[Route('/do_dl_signed/{token}', name: 'do_dl_signed', defaults: ['dl' => 1, '_signed' => true])]
@@ -53,7 +58,6 @@ class MainController extends AbstractController
             throw $this->createAccessDeniedException('Lien expiré : '.$token);
         }
 
-
         if ($request->get('dl')) {
 
             #var_dump(__METHOD__, 'dl', $request->get('dl'));exit;
@@ -68,7 +72,10 @@ class MainController extends AbstractController
             $em->persist($dl);
             $em->flush();
 
-            return new BinaryFileResponse($path, contentDisposition: 'attachment', autoLastModified: false);
+            return new BinaryFileResponse($path,
+                contentDisposition: $request->get('inline') ? 'inline' : 'attachment',
+                autoLastModified: false
+            );
         }
         else {
             #var_dump(__METHOD__, 'preview');
@@ -84,6 +91,7 @@ class MainController extends AbstractController
         }
     }
 
+    #[Route('/', name: 'dl_fairyfiles_index', host: '*.fairyfiles.ovh')]
     #[Route('/dl/', name: 'dl_index')]
     public function dlIndex(Request $request, ManagerRegistry $doctrine): Response
     {
