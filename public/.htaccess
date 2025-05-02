@@ -31,6 +31,7 @@ DirectoryIndex index.php
 
 
     Redirect 301 /lt/ https://linktr.ee/fairytalesinyoghourt
+    Redirect 301 /zikeur/ https://linktr.ee/benoitguchet
 
     # Determine the RewriteBase automatically and set it as environment variable.
     # If you are using Apache aliases to do mass virtual hosting or installed the
@@ -45,6 +46,12 @@ DirectoryIndex index.php
     # Sets the HTTP_AUTHORIZATION header removed by Apache
     RewriteCond %{HTTP:Authorization} .+
     RewriteRule ^ - [E=HTTP_AUTHORIZATION:%0]
+
+    #RewriteCond %{HTTP_HOST} =cv-benoit-guchet.fairyfiles.ovh [NC]
+    #RewriteRule ^/?$ /index.php/dl/cv_dev [L]
+    #RewriteCond %{HTTP_HOST} =cv-benoit-guchet.fairyfiles.ovh [NC]
+    #RewriteRule ^$ index.php/dl/fr/cv_dev [L]
+
 
     # Redirect to URI without front controller to prevent duplicate content
     # (with and without `/index.php`). Only do this redirect on the initial
