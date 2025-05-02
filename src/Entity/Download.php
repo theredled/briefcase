@@ -17,6 +17,12 @@ class Download
     #[ORM\Column(type: Types::DATETIME_MUTABLE)]
     private ?\DateTimeInterface $date = null;
 
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
+    private ?\DateTimeInterface $fileModificationDate = null;
+
+    #[ORM\Column(type: Types::STRING, nullable: true)]
+    private ?string $fileName = null;
+
     #[ORM\Column(nullable: true)]
     private ?int $file_id = null;
 
@@ -92,5 +98,25 @@ class Download
         $this->File = $File;
 
         return $this;
+    }
+
+    public function getFileModificationDate(): ?\DateTimeInterface
+    {
+        return $this->fileModificationDate;
+    }
+
+    public function setFileModificationDate(?\DateTimeInterface $fileModificationDate): void
+    {
+        $this->fileModificationDate = $fileModificationDate;
+    }
+
+    public function getFileName(): ?string
+    {
+        return $this->fileName;
+    }
+
+    public function setFileName(?string $fileName): void
+    {
+        $this->fileName = $fileName;
     }
 }

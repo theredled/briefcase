@@ -5,18 +5,41 @@ namespace App\Entity;
 use App\Repository\DownloadableFileRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\DBAL\Types\Types;
+use Doctrine\ORM\Event\PreUpdateEventArgs;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: DownloadableFileRepository::class)]
+#[ORM\HasLifecycleCallbacks]
 class DownloadableFile
 {
+
+    public function getExtension()
+    {
+        return pathinfo($this->getFilename(), PATHINFO_EXTENSION);
+    }
+
+    public function getDownloadFilename()
+    {
+        $date = $this->fileModificationDate;
+        return str_replace(' ', '-', $this->getName()).($date ? '-'.$date->format('Ymd') : '').'.'.$this->getExtension();
+    }
+
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
     private ?int $id = null;
 
+
+
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $filename = null;
+
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
+    private ?\DateTime $creationDate = null;
+
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
+    private ?\DateTime $fileModificationDate = null;
 
     #[ORM\Column(length: 255)]
     private ?string $token = null;
@@ -40,6 +63,8 @@ class DownloadableFile
     {
         return $this->getName();
     }
+
+
 
     public function __construct()
     {
@@ -154,9 +179,40 @@ class DownloadableFile
         return $this->sensible;
     }
 
-    public function setSensible(bool $sensible = null)
+    public function setSensible(?bool $sensible)
     {
         $this->sensible = $sensible;
         return $this;
+    }
+
+    public function getFileModificationDate(): ?\DateTime
+    {
+        return $this->fileModificationDate;
+    }
+
+    public function setFileModificationDate(?\DateTime $fileModificationDate): void
+    {
+        $this->fileModificationDate = $fileModificationDate;
+    }
+
+    public function getCreationDate(): ?\DateTime
+    {
+        return $this->creationDate;
+    }
+
+    public function setCreationDate(?\DateTime $creationDate): void
+    {
+        $this->creationDate = $creationDate;
+    }
+
+
+    #[ORM\PreUpdate]
+    public function preUpdate(PreUpdateEventArgs $eventArgs): void
+    {
+        if($eventArgs->hasChangedField('filename')){
+            //$newName = $eventArgs->getNewValue('filename');
+            $this->setFileModificationDate(new \DateTime('now'));
+        }
+
     }
 }
