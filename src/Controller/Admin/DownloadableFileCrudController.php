@@ -45,7 +45,6 @@ class DownloadableFileCrudController extends AbstractCrudController
             ChoiceField::new('lang')->setChoices(['FR' => 'fr', 'EN' => 'en']),
             ImageField::new('filename')->setUploadDir(DownloadableFile::getUploadDir())
                 ->hideOnIndex()
-                ->hideOnDetail()
                 ->setFileConstraints([]),
             BooleanField::new('isFolder'),
             BooleanField::new('sensible'),
@@ -79,6 +78,7 @@ class DownloadableFileCrudController extends AbstractCrudController
     {
         $entity = new DownloadableFile();
         $entity->setCreationDate(new \DateTime('now'));
+        $entity->setFileModificationDate(new \DateTime('now'));
         return $entity;
     }
 

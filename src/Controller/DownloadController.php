@@ -20,6 +20,7 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use \ZipArchive;
 
 class DownloadController extends AbstractController
 {
@@ -62,7 +63,7 @@ class DownloadController extends AbstractController
         }
     }
 
-    #[Route('/', name: 'dl_fairyfiles_index', host: '*.fairyfiles.ovh')]
+    #[Route('/', name: 'dl_fairyfiles_index', host: 'fairyfiles.ovh')]
     #[Route('/dl/', name: 'dl_index')]
     public function dlIndex(Request $request, ManagerRegistry $doctrine): Response
     {
@@ -160,6 +161,8 @@ class DownloadController extends AbstractController
             return 'fa-file-archive';
 
         $absPath = $this->getParameter('project_dir').'/'.$fileEntity->getRelativePath();
+        if (!is_file($absPath))
+            return $defaultClass;
         $fileEntity->mimeType = mime_content_type($absPath);
 
         if (!$fileEntity->mimeType)
