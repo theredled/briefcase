@@ -21,7 +21,9 @@
         "symfony/password-hasher": "6.4.*",
         "symfony/runtime": "6.4.*",
         "symfony/yaml": "6.4.*",
-        "tilleuls/url-signer-bundle": "^2.2"
+        "tilleuls/url-signer-bundle": "^2.2",
+      "ext-zip": "*",
+      "ext-intl": "*"
     },
     "config": {
         "allow-plugins": {
