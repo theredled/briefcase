@@ -1,4 +1,6 @@
 {
+    "name": "theredled/ftiy2",
+    "description": "Files sharing",
     "type": "project",
     "license": "proprietary",
     "minimum-stability": "stable",
