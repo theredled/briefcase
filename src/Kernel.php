@@ -15,5 +15,10 @@ class Kernel extends BaseKernel
         parent::__construct($environment, $debug);
     }
 
+    public function getVarDir()
+    {
+        return $this->getProjectDir().'/var';
+    }
+
 
 }
