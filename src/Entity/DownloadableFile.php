@@ -14,15 +14,19 @@ use Doctrine\ORM\Mapping as ORM;
 class DownloadableFile
 {
 
-    public function getExtension()
+    public function getDownloadExtension()
     {
-        return pathinfo($this->getFilename(), PATHINFO_EXTENSION);
+        if ($this->isFolder())
+            $ext = 'zip';
+        else
+            $ext = pathinfo($this->getFilename(), PATHINFO_EXTENSION);
+        return $ext;
     }
 
     public function getDownloadFilename()
     {
         $date = $this->fileModificationDate;
-        return str_replace(' ', '-', $this->getName()).($date ? '-'.$date->format('Ymd') : '').'.'.$this->getExtension();
+        return str_replace(' ', '-', $this->getName()).($date ? '-'.$date->format('Ymd') : '').'.'.$this->getDownloadExtension();
     }
 
     #[ORM\Id]

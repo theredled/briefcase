@@ -24,6 +24,7 @@ use \ZipArchive;
 
 class DownloadController extends AbstractController
 {
+
     #[Route('/', name: 'dl_cv', defaults: ['token' => 'cv_dev', 'dl' => 1,'inline' => 1], host: 'cv-benoit-guchet.fairyfiles.ovh')]
     #[Route('/dl/{lang}/{token}', name: 'dl_item_lang')]
     #[Route('/dl/{token}', name: 'dl_item')]
@@ -31,15 +32,7 @@ class DownloadController extends AbstractController
     #[Route('/dl_signed/{token}', name: 'dl_item_signed', defaults: ['_signed' => true])]
     public function dlItem($token, Request $request, ManagerRegistry $doctrine, UrlSignerInterface $urlSigner): Response
     {
-        $lang = $this->getLang($request);
-
-        $fileEntity = $doctrine->getRepository(DownloadableFile::class)->findOneBy(['token' => $token, 'lang' => $lang]);
-        if (!$fileEntity)
-            $fileEntity = $doctrine->getRepository(DownloadableFile::class)->findOneBy(['token' => $token]);
-        if (!$fileEntity)
-            throw $this->createAccessDeniedException('Fichier non trouvé : '.$token);
-        if ($fileEntity->getSensible() and !$request->get('_signed'))
-            throw $this->createAccessDeniedException('Lien expiré : '.$token);
+        $fileEntity = $this->findEntity($token, $doctrine, $request);
 
         //-- DL direct
         if ($request->get('dl') or $request->get('inline')) {
@@ -48,7 +41,8 @@ class DownloadController extends AbstractController
             $this->registerDownload($fileEntity, $request, $doctrine);
 
             $response = new BinaryFileResponse($path, autoLastModified: false);
-            $response->setContentDisposition(($request->get('inline') ? 'inline' : 'attachment'), $fileEntity->getDownloadFilename());
+            $contentDisposition = 'inline';//$request->get('inline') ? 'inline' : 'attachment';
+            $response->setContentDisposition($contentDisposition, $fileEntity->getDownloadFilename());
             return $response;
         }
         //-- Pour preview réseaux sociaux/chat
@@ -123,6 +117,20 @@ class DownloadController extends AbstractController
         return new BinaryFileResponse($zipPath);
     }
 
+
+    #[Route('/{token}', name: 'dl_anything')]
+    #[Route('/{token}.{ext}', name: 'dl_anything_ext')]
+    #[Route('/{lang}/{token}}', name: 'dl_anything_lang')]
+    #[Route('/{lang}/{token}.{ext}', name: 'dl_anything_lang_ext')]
+    public function dlAnything($token, Request $request, ManagerRegistry $doctrine)
+    {
+        $fileEntity = $this->findEntity($token, $doctrine, $request);
+        if ($fileEntity->isFolder())
+            return $this->redirectToRoute('dl_folder', ['token' => $token]);
+        else
+            return $this->redirectToRoute('dl_item', ['token' => $token]);
+    }
+
     protected function getLastModificationTimeInFiles($files)
     {
         $lastTime = null;
@@ -193,6 +201,28 @@ class DownloadController extends AbstractController
             return $lang;
         else
             return $available[0];
+    }
+
+    /**
+     * @param ManagerRegistry $doctrine
+     * @param $token
+     * @param mixed $lang
+     * @return DownloadableFile|object|null
+     */
+    protected function findEntity($token, ManagerRegistry $doctrine, Request $request): null|DownloadableFile
+    {
+        $lang = $this->getLang($request);
+
+        $fileEntity = $doctrine->getRepository(DownloadableFile::class)->findOneBy(['token' => $token, 'lang' => $lang]);
+        if (!$fileEntity)
+            $fileEntity = $doctrine->getRepository(DownloadableFile::class)->findOneBy(['token' => $token]);
+
+        if (!$fileEntity)
+            throw $this->createAccessDeniedException('Fichier non trouvé : '.$token);
+        if ($fileEntity->getSensible() and !$request->get('_signed'))
+            throw $this->createAccessDeniedException('Lien expiré : '.$token);
+
+        return $fileEntity;
     }
 
 }

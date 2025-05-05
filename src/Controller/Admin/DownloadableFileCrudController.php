@@ -8,6 +8,7 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Assets;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
@@ -48,30 +49,22 @@ class DownloadableFileCrudController extends AbstractCrudController
                 ->setFileConstraints([]),
             BooleanField::new('isFolder'),
             BooleanField::new('sensible'),
-            DateTimeField::new('creationDate')->hideOnForm(),
-            DateTimeField::new('fileModificationDate')->hideOnForm(),
+            DateTimeField::new('creationDate')->hideOnForm()->setFormat('dd/MM/yyyy'),
+            DateTimeField::new('fileModificationDate')->hideOnForm()->setFormat('dd/MM/yyyy'),
         ];
     }
 
     public function configureActions(Actions $actions): Actions
     {
         $viewFile = Action::new('viewFile', 'Lien', 'fa fa-link')
+            ->setTemplatePath('admin/copyLinkAction.html.twig')
             ->linkToUrl(function (DownloadableFile $file) {
-                if ($file->getSensible()) {
-                    $url = $this->generateUrl('dl_item_signed', ['token' => $file->getToken()]);
-                    $url = $this->urlSigner->sign($url);
-                }
-                elseif ($file->isFolder())
-                    $url = $this->generateUrl('dl_folder', ['token' => $file->getToken()]);
-                else
-                    $url = $this->generateUrl('dl_item', ['token' => $file->getToken()]);
-                return $url;
+                return $this->getDownloadUrl($file);
             })
             ->displayAsLink();
 
         return $actions
-            ->add(Crud::PAGE_INDEX, $viewFile)
-        ;
+            ->add(Crud::PAGE_INDEX, $viewFile);
     }
 
     public function createEntity(string $entityFqcn)
@@ -90,5 +83,26 @@ class DownloadableFileCrudController extends AbstractCrudController
     public function persistEntity(EntityManagerInterface $em, $entity): void
     {
         parent::persistEntity($em, $entity);
+    }
+
+    protected function getDownloadUrl(DownloadableFile $file): string
+    {
+        if ($file->getSensible()) {
+            $url = $this->generateUrl('dl_item_signed', ['token' => $file->getToken()]);
+            $url = $this->urlSigner->sign($url);
+        } else
+            $url = $this->generateUrl('dl_anything', [
+                'token' => $file->getToken(),
+                //'ext' => $file->getDownloadExtension()
+            ]);
+
+        return $url;
+    }
+
+    public function configureAssets(Assets $assets): Assets
+    {
+        return $assets
+            ->addJsFile('js/admin.js')
+            ->addCssFile('css/admin.css');
     }
 }
