@@ -15,10 +15,6 @@ class DownloadTest extends WebTestCase
     {
         self::bootKernel();
         $this->client = static::createClient();
-        self::loadFixtureFiles([
-            self::$kernel->getVarDir(). '/../fixtures/downloadableFiles.yaml',
-            __DIR__ . '/../fixtures/posts.yaml',
-        ]);
     }
     public function testSomething(): void
     {

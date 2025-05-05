@@ -87,6 +87,7 @@ class DownloadController extends AbstractController
     public function dlFolder($token, Request $request, Filesystem $filesystem, ManagerRegistry $doctrine): Response
     {
         $lang = $this->getLang($request, ['fr']);
+        //var_dump(__METHOD__);exit;
 
         $fileEntity = $doctrine->getRepository(DownloadableFile::class)->findOneBy(['token' => $token, 'lang' => $lang]);
         if (!$fileEntity)
@@ -96,21 +97,32 @@ class DownloadController extends AbstractController
 
         $dirname = $token.'_'.$fileEntity->getLang();
         $path = $this->getParameter('web_dir').'/dl/'.$dirname;
-        $files = glob($path.'/*.*');
+        $filesInFolder = glob($path.'/*.*');
         $filesystem->mkdir($this->getParameter('zip_cache_dir'));
         $zipPath = $this->getParameter('zip_cache_dir').'/'.$dirname.'.zip';
 
-        if (!is_file($zipPath) or $this->getLastModificationTimeInFiles($files) > filemtime($zipPath)) {
+        //-- Fichers dans le dossier + fichiers liés
+        $allFiles = array_merge($filesInFolder, $fileEntity->getIncludedFiles()->toArray());
+        $filesAreAhead = !is_file($zipPath)
+            || $this->getLastModificationTimeInFiles($allFiles) > filemtime($zipPath)
+            || $fileEntity->getFileModificationDate()->getTimestamp() > filemtime($zipPath);
+
+        if ($filesAreAhead) {
             $zip = new \ZipArchive();
             if (is_file($zipPath))
                 unlink($zipPath);
             if ($ret = $zip->open($zipPath, \ZipArchive::CREATE) !== true)
                 throw new \Exception('Erreur Zip : '.$ret.', '.$zip->getStatusString());
             $zip->addEmptyDir($dirname);
-            if (!count($files))
+            if (!count($filesInFolder) and $fileEntity->getIncludedFiles()->count() == 0)
                 throw new \Exception('No files in '.$path);
-            foreach ($files as $file)
+            foreach ($filesInFolder as $file)
                 $zip->addFile($file, $dirname.'/'.basename($file));
+            foreach ($fileEntity->getIncludedFiles() as $includedFile)
+                $zip->addFile(
+                    $this->getParameter('project_dir').'/'.$includedFile->getRelativePath(),
+                    $dirname.'/'.basename($includedFile->getDownloadFilename())
+                );
             $zip->close();
         }
 
@@ -131,14 +143,20 @@ class DownloadController extends AbstractController
             return $this->redirectToRoute('dl_item', ['token' => $token]);
     }
 
-    protected function getLastModificationTimeInFiles($files)
+    protected function getLastModificationTimeInFiles(array $files)
     {
-        $lastTime = null;
-        foreach ($files as $file)
-            if (filemtime($file) > $lastTime)
-                $lastTime = filemtime($file);
+        $latestTime = null;
+        foreach ($files as $file) {
+            if ($file instanceof DownloadableFile)
+                $fileModTime = $file->getFileModificationDate($this->getParameter('project_dir'))->getTimestamp();
+            else
+                $fileModTime = filemtime($file);
 
-        return $lastTime;
+            if ($fileModTime > $latestTime)
+                $latestTime = $fileModTime;
+        }
+
+        return $latestTime;
     }
 
     /**

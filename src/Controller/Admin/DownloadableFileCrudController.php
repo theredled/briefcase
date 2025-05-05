@@ -6,13 +6,16 @@ use App\Entity\DownloadableFile;
 use CoopTilleuls\UrlSignerBundle\UrlSigner\UrlSignerInterface;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\QueryBuilder;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Assets;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
+use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ChoiceField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\CollectionField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateTimeField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ImageField;
@@ -47,10 +50,13 @@ class DownloadableFileCrudController extends AbstractCrudController
             ImageField::new('filename')->setUploadDir(DownloadableFile::getUploadDir())
                 ->hideOnIndex()
                 ->setFileConstraints([]),
-            BooleanField::new('isFolder'),
+            BooleanField::new('isFolder') ,
             BooleanField::new('sensible'),
             DateTimeField::new('creationDate')->hideOnForm()->setFormat('dd/MM/yyyy'),
             DateTimeField::new('fileModificationDate')->hideOnForm()->setFormat('dd/MM/yyyy'),
+            AssociationField::new('IncludedFiles')->setQueryBuilder(function(QueryBuilder $qb) {
+                $qb->andWhere('entity.isFolder = FALSE');
+            }),
         ];
     }
 

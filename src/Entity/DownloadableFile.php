@@ -14,6 +14,37 @@ use Doctrine\ORM\Mapping as ORM;
 class DownloadableFile
 {
 
+
+    public function getFileModificationDate($project_dir = null): ?\DateTime
+    {
+        if ($this->fileModificationDate)
+            return $this->fileModificationDate;
+        elseif ($project_dir) {
+            $absPath = $project_dir . '/' . self::getUploadDir() . '/' . $this->getFilename();
+            if (!file_exists($absPath))
+                return null;
+            return (new \DateTime())->setTimestamp(filemtime($absPath));
+        }
+        else
+            return new \DateTime('now');
+    }
+    #[ORM\PreUpdate]
+    public function preUpdate(PreUpdateEventArgs $eventArgs): void
+    {
+        $changed = false;
+        if($eventArgs->hasChangedField('filename'))
+            $changed = true;
+        if ($this->isFolder() and $this->getIncludedFiles()->isDirty()) {
+            $removed = $this->getIncludedFiles()->getDeleteDiff();
+            $inserted = $this->getIncludedFiles()->getInsertDiff();
+            if ($removed || $inserted)
+                $changed = true;
+        }
+
+        if ($changed)
+            $this->setFileModificationDate(new \DateTime('now'));
+    }
+
     public function getDownloadExtension()
     {
         if ($this->isFolder())
@@ -26,7 +57,8 @@ class DownloadableFile
     public function getDownloadFilename()
     {
         $date = $this->fileModificationDate;
-        return str_replace(' ', '-', $this->getName()).($date ? '-'.$date->format('Ymd') : '').'.'.$this->getDownloadExtension();
+        //return str_replace(' ', '-', $this->getName()).($date ? '-'.$date->format('Ymd') : '').'.'.$this->getDownloadExtension();
+        return $this->getName().($date ? ' ('.$date->format('Ymd').')' : '').'.'.$this->getDownloadExtension();
     }
 
     #[ORM\Id]
@@ -63,6 +95,18 @@ class DownloadableFile
     #[ORM\Column(nullable: true)]
     private ?bool $sensible = false;
 
+    /**
+     * @var Collection<int, self>
+     */
+    #[ORM\ManyToMany(targetEntity: self::class, inversedBy: 'Containers')]
+    private Collection $IncludedFiles;
+
+    /**
+     * @var Collection<int, self>
+     */
+    #[ORM\ManyToMany(targetEntity: self::class, mappedBy: 'IncludedFiles')]
+    private Collection $Containers;
+
     public function __toString()
     {
         return $this->getName();
@@ -73,6 +117,8 @@ class DownloadableFile
     public function __construct()
     {
         $this->Downloads = new ArrayCollection();
+        $this->IncludedFiles = new ArrayCollection();
+        $this->DownloadableContainer = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -189,10 +235,6 @@ class DownloadableFile
         return $this;
     }
 
-    public function getFileModificationDate(): ?\DateTime
-    {
-        return $this->fileModificationDate;
-    }
 
     public function setFileModificationDate(?\DateTime $fileModificationDate): void
     {
@@ -209,14 +251,54 @@ class DownloadableFile
         $this->creationDate = $creationDate;
     }
 
-
-    #[ORM\PreUpdate]
-    public function preUpdate(PreUpdateEventArgs $eventArgs): void
+    /**
+     * @return Collection<int, self>
+     */
+    public function getIncludedFiles(): Collection
     {
-        if($eventArgs->hasChangedField('filename')){
-            //$newName = $eventArgs->getNewValue('filename');
-            $this->setFileModificationDate(new \DateTime('now'));
+        return $this->IncludedFiles;
+    }
+
+    public function addIncludedFile(self $includedFile): static
+    {
+        if (!$this->IncludedFiles->contains($includedFile)) {
+            $this->IncludedFiles->add($includedFile);
         }
 
+        return $this;
+    }
+
+    public function removeIncludedFile(self $includedFile): static
+    {
+        $this->IncludedFiles->removeElement($includedFile);
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, self>
+     */
+    public function getDownloadableContainer(): Collection
+    {
+        return $this->DownloadableContainer;
+    }
+
+    public function addDownloadbleContainer(self $downloadbleContainer): static
+    {
+        if (!$this->DownloadableContainer->contains($downloadbleContainer)) {
+            $this->DownloadableContainer->add($downloadbleContainer);
+            $downloadbleContainer->addIncludedFile($this);
+        }
+
+        return $this;
+    }
+
+    public function removeDownloadbleContainer(self $downloadbleContainer): static
+    {
+        if ($this->DownloadableContainer->removeElement($downloadbleContainer)) {
+            $downloadbleContainer->removeIncludedFile($this);
+        }
+
+        return $this;
     }
 }
