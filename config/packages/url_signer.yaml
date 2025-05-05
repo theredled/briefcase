@@ -1,3 +1,6 @@
 coop_tilleuls_url_signer:
     signature_key: '%env(string:SIGNATURE_KEY)%'
     default_expiration: '2 month'
+    expires_parameter: 'e' # 'expires' by default
+    signature_parameter: 's' # 'signature' by default
+    signer: 'simpler_signer' #
