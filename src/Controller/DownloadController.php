@@ -130,10 +130,10 @@ class DownloadController extends AbstractController
     }
 
 
-    #[Route('/{token}', name: 'dl_anything')]
-    #[Route('/{token}.{ext}', name: 'dl_anything_ext')]
-    #[Route('/{lang}/{token}}', name: 'dl_anything_lang')]
-    #[Route('/{lang}/{token}.{ext}', name: 'dl_anything_lang_ext')]
+    #[Route('/d/{token}', name: 'dl_anything')]
+    #[Route('/d/{token}.{ext}', name: 'dl_anything_ext')]
+    #[Route('/d/{lang}/{token}}', name: 'dl_anything_lang')]
+    #[Route('/d/{lang}/{token}.{ext}', name: 'dl_anything_lang_ext')]
     public function dlAnything($token, Request $request, ManagerRegistry $doctrine)
     {
         $fileEntity = $this->findEntity($token, $doctrine, $request);
