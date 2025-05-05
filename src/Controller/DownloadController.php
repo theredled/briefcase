@@ -25,6 +25,24 @@ use \ZipArchive;
 class DownloadController extends AbstractController
 {
 
+    #[Route('/', name: 'dl_fairyfiles_index', host: 'fairyfiles.ovh')]
+    #[Route('/dl/', name: 'dl_index')]
+    public function dlIndex(Request $request, ManagerRegistry $doctrine): Response
+    {
+        $lang = $this->getLang($request);
+
+        $fileEntities = $doctrine->getRepository(DownloadableFile::class)->findNotSensible();
+
+        foreach ($fileEntities as $item) {
+            $item->faCssClass = $this->getFaCssClass($item);
+        }
+
+        return $this->render('main/dlIndex.html.twig', [
+            'lang' => $request->getPreferredLanguage(['fr', 'en']),
+            'items' => $fileEntities,
+        ]);
+    }
+
     #[Route('/', name: 'dl_cv', defaults: ['token' => 'cv_dev', 'dl' => 1,'inline' => 1], host: 'cv-benoit-guchet.fairyfiles.ovh')]
     #[Route('/dl/{lang}/{token}', name: 'dl_item_lang')]
     #[Route('/dl/{token}', name: 'dl_item')]
@@ -55,24 +73,6 @@ class DownloadController extends AbstractController
                 'do_redirect' => true
             ]);
         }
-    }
-
-    #[Route('/', name: 'dl_fairyfiles_index', host: 'fairyfiles.ovh')]
-    #[Route('/dl/', name: 'dl_index')]
-    public function dlIndex(Request $request, ManagerRegistry $doctrine): Response
-    {
-        $lang = $this->getLang($request);
-
-        $fileEntities = $doctrine->getRepository(DownloadableFile::class)->findNotSensible();
-
-        foreach ($fileEntities as $item) {
-            $item->faCssClass = $this->getFaCssClass($item);
-        }
-
-        return $this->render('main/dlIndex.html.twig', [
-            'lang' => $request->getPreferredLanguage(['fr', 'en']),
-            'items' => $fileEntities,
-        ]);
     }
 
 

@@ -20,7 +20,7 @@ class MainController extends AbstractController
 
     #[Route('/',
         name: 'home',
-         condition: 'request.getHttpHost() != "cv-benoit-guchet.fairyfiles.ovh"'
+         condition: 'request.getHttpHost() != "cv-benoit-guchet.fairyfiles.ovh" && request.getHttpHost() != "fairyfiles.ovh"'
     )]
     public function index(Request $request): Response
     {
