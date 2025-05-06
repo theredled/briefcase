@@ -148,7 +148,7 @@ class DownloadController extends AbstractController
         $latestTime = null;
         foreach ($files as $file) {
             if ($file instanceof DownloadableFile)
-                $fileModTime = $file->getFileModificationDate($this->getParameter('project_dir'))->getTimestamp();
+                $fileModTime = $file->getCalcFileModificationDate($this->getParameter('project_dir'))->getTimestamp();
             else
                 $fileModTime = filemtime($file);
 

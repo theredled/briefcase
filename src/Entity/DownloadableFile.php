@@ -15,7 +15,12 @@ class DownloadableFile
 {
 
 
-    public function getFileModificationDate($project_dir = null): ?\DateTime
+    public function getFileModificationDate(): ?\DateTime
+    {
+        return $this->fileModificationDate;
+    }
+
+    public function getCalcFileModificationDate($project_dir): ?\DateTime
     {
         if ($this->fileModificationDate)
             return $this->fileModificationDate;
@@ -28,6 +33,7 @@ class DownloadableFile
         else
             return new \DateTime('now');
     }
+
     #[ORM\PreUpdate]
     public function preUpdate(PreUpdateEventArgs $eventArgs): void
     {
