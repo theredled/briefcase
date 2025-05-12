@@ -20,6 +20,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\DateTimeField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ImageField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Validator\Constraints\File;
 
 class DownloadableFileCrudController extends AbstractCrudController
@@ -49,6 +50,13 @@ class DownloadableFileCrudController extends AbstractCrudController
             ChoiceField::new('lang')->setChoices(['FR' => 'fr', 'EN' => 'en']),
             ImageField::new('filename')->setUploadDir(DownloadableFile::getUploadDir())
                 ->hideOnIndex()
+                ->setUploadedFileNamePattern(function (UploadedFile $file) {
+                  return sprintf('%s_%d.%s',
+                      preg_replace('/[^a-z0-9._-]+/i', '-', $file->getClientOriginalName()),
+                      random_int(1, 999),
+                      $file->guessExtension()
+                  );
+                })
                 ->setFileConstraints([]),
             BooleanField::new('isFolder') ,
             BooleanField::new('sensible'),
