@@ -1,6 +1,7 @@
 
 @source '../views';
 @source '../../vendor/laravel/framework/src/Illuminate/Pagination/resources/views/*.blade.php';
+@source '../../node_modules/fontawesome-free/css/all.css';
 
 @font-face {
     font-family: "American Typewriter";

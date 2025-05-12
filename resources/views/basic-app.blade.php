@@ -13,7 +13,7 @@
     @vite([
         'resources/js/app.js',
         'resources/css/app.css',
-        'resources/css/fontawesome-pro-5.12.0-web/css/all.css',
+        'node_modules/fontawesome-free/css/all.css'
     ])
 
     <link rel="preconnect" href="https://fonts.bunny.net">
