@@ -11,4 +11,5 @@
 /var/data.db
 ###< symfony/framework-bundle ###
 /var/downloadable_files/
+/var/documents/
 /public/dl/

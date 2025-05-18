@@ -2,26 +2,26 @@
 
 namespace App\Repository;
 
-use App\Entity\DownloadableFile;
+use App\Entity\Document;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
 
 /**
- * @extends ServiceEntityRepository<DownloadableFile>
+ * @extends ServiceEntityRepository<Document>
  *
- * @method DownloadableFile|null find($id, $lockMode = null, $lockVersion = null)
- * @method DownloadableFile|null findOneBy(array $criteria, array $orderBy = null)
- * @method DownloadableFile[]    findAll()
- * @method DownloadableFile[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
+ * @method Document|null find($id, $lockMode = null, $lockVersion = null)
+ * @method Document|null findOneBy(array $criteria, array $orderBy = null)
+ * @method Document[]    findAll()
+ * @method Document[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class DownloadableFileRepository extends ServiceEntityRepository
+class DocumentRepository extends ServiceEntityRepository
 {
     public function __construct(ManagerRegistry $registry)
     {
-        parent::__construct($registry, DownloadableFile::class);
+        parent::__construct($registry, Document::class);
     }
 
-    public function save(DownloadableFile $entity, bool $flush = false): void
+    public function save(Document $entity, bool $flush = false): void
     {
         $this->getEntityManager()->persist($entity);
 
@@ -36,7 +36,7 @@ class DownloadableFileRepository extends ServiceEntityRepository
         return $qb->getQuery()->getResult();
     }
 
-    public function remove(DownloadableFile $entity, bool $flush = false): void
+    public function remove(Document $entity, bool $flush = false): void
     {
         $this->getEntityManager()->remove($entity);
 
@@ -46,7 +46,7 @@ class DownloadableFileRepository extends ServiceEntityRepository
     }
 
 //    /**
-//     * @return DownloadableFile[] Returns an array of DownloadableFile objects
+//     * @return Document[] Returns an array of Document objects
 //     */
 //    public function findByExampleField($value): array
 //    {
@@ -60,7 +60,7 @@ class DownloadableFileRepository extends ServiceEntityRepository
 //        ;
 //    }
 
-//    public function findOneBySomeField($value): ?DownloadableFile
+//    public function findOneBySomeField($value): ?Document
 //    {
 //        return $this->createQueryBuilder('d')
 //            ->andWhere('d.exampleField = :val')

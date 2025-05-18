@@ -11,7 +11,7 @@ namespace App\Controller;
 
 
 use App\Entity\Download;
-use App\Entity\DownloadableFile;
+use App\Entity\Document;
 use CoopTilleuls\UrlSignerBundle\UrlSigner\UrlSignerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -31,7 +31,7 @@ class DownloadController extends AbstractController
     {
         $lang = $this->getLang($request);
 
-        $fileEntities = $doctrine->getRepository(DownloadableFile::class)->findNotSensible();
+        $fileEntities = $doctrine->getRepository(Document::class)->findNotSensible();
 
         foreach ($fileEntities as $item) {
             $item->faCssClass = $this->getFaCssClass($item);
@@ -89,9 +89,9 @@ class DownloadController extends AbstractController
         $lang = $this->getLang($request, ['fr']);
         //var_dump(__METHOD__);exit;
 
-        $fileEntity = $doctrine->getRepository(DownloadableFile::class)->findOneBy(['token' => $token, 'lang' => $lang]);
+        $fileEntity = $doctrine->getRepository(Document::class)->findOneBy(['token' => $token, 'lang' => $lang]);
         if (!$fileEntity)
-            $fileEntity = $doctrine->getRepository(DownloadableFile::class)->findOneBy(['token' => $token]);
+            $fileEntity = $doctrine->getRepository(Document::class)->findOneBy(['token' => $token]);
         if (!$fileEntity)
             return $this->redirectToRoute('dl_index');
 
@@ -147,7 +147,7 @@ class DownloadController extends AbstractController
     {
         $latestTime = null;
         foreach ($files as $file) {
-            if ($file instanceof DownloadableFile)
+            if ($file instanceof Document)
                 $fileModTime = $file->getCalcFileModificationDate($this->getParameter('project_dir'))->getTimestamp();
             else
                 $fileModTime = filemtime($file);
@@ -160,12 +160,12 @@ class DownloadController extends AbstractController
     }
 
     /**
-     * @param object|DownloadableFile $fileEntity
+     * @param object|Document $fileEntity
      * @param Request $request
      * @param ManagerRegistry $doctrine
      * @return void
      */
-    protected function registerDownload(DownloadableFile $fileEntity, Request $request, ManagerRegistry $doctrine): void
+    protected function registerDownload(Document $fileEntity, Request $request, ManagerRegistry $doctrine): void
     {
         $dl = new Download();
         $dl->setFile($fileEntity);
@@ -179,7 +179,7 @@ class DownloadController extends AbstractController
         $em->flush();
     }
 
-    protected function getFaCssClass(DownloadableFile $fileEntity)
+    protected function getFaCssClass(Document $fileEntity)
     {
         $defaultClass = 'fa-file-alt';
 
@@ -225,15 +225,15 @@ class DownloadController extends AbstractController
      * @param ManagerRegistry $doctrine
      * @param $token
      * @param mixed $lang
-     * @return DownloadableFile|object|null
+     * @return Document|object|null
      */
-    protected function findEntity($token, ManagerRegistry $doctrine, Request $request): null|DownloadableFile
+    protected function findEntity($token, ManagerRegistry $doctrine, Request $request): null|Document
     {
         $lang = $this->getLang($request);
 
-        $fileEntity = $doctrine->getRepository(DownloadableFile::class)->findOneBy(['token' => $token, 'lang' => $lang]);
+        $fileEntity = $doctrine->getRepository(Document::class)->findOneBy(['token' => $token, 'lang' => $lang]);
         if (!$fileEntity)
-            $fileEntity = $doctrine->getRepository(DownloadableFile::class)->findOneBy(['token' => $token]);
+            $fileEntity = $doctrine->getRepository(Document::class)->findOneBy(['token' => $token]);
 
         if (!$fileEntity)
             throw $this->createAccessDeniedException('Fichier non trouvé : '.$token);

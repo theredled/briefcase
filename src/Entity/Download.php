@@ -33,7 +33,7 @@ class Download
     private ?string $ip = null;
 
     #[ORM\ManyToOne(inversedBy: 'Downloads')]
-    private ?DownloadableFile $File = null;
+    private ?Document $File = null;
 
     public function getId(): ?int
     {
@@ -88,12 +88,12 @@ class Download
         return $this;
     }
 
-    public function getFile(): ?DownloadableFile
+    public function getFile(): ?Document
     {
         return $this->File;
     }
 
-    public function setFile(?DownloadableFile $File): self
+    public function setFile(?Document $File): self
     {
         $this->File = $File;
 

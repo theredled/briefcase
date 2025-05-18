@@ -2,7 +2,7 @@
 
 namespace App\Controller\Admin;
 
-use App\Entity\DownloadableFile;
+use App\Entity\Document;
 use CoopTilleuls\UrlSignerBundle\UrlSigner\UrlSignerInterface;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
@@ -11,6 +11,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Assets;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
+use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
@@ -20,10 +21,13 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\DateTimeField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ImageField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Validator\Constraints\File;
+use Vich\UploaderBundle\Form\Type\VichImageType;
 
-class DownloadableFileCrudController extends AbstractCrudController
+class DocumentCrudController extends AbstractCrudController
 {
     public function __construct(
         private UrlSignerInterface $urlSigner,
@@ -33,13 +37,21 @@ class DownloadableFileCrudController extends AbstractCrudController
 
     public static function getEntityFqcn(): string
     {
-        return DownloadableFile::class;
+        return Document::class;
     }
 
     public function configureCrud(Crud $crud): Crud
     {
         return $crud->setDefaultSort(['sensible' => 'DESC', 'token' => 'ASC'])
-            ->showEntityActionsInlined();
+            ->showEntityActionsInlined(); // Cette ligne configure le comportement par défaut
+            ;
+    }
+
+    #[Route('/admin_view_file/{filename}', name: 'admin_view_file')]
+    public function viewFileAction($filename)
+    {
+        $path = $this->getParameter('project_dir').'/'.Document::getUploadDir().'/'.$filename;
+        return new BinaryFileResponse($path);
     }
 
     public function configureFields(string $pageName): iterable
@@ -48,7 +60,7 @@ class DownloadableFileCrudController extends AbstractCrudController
             TextField::new('token'),
             TextField::new('name'),
             ChoiceField::new('lang')->setChoices(['FR' => 'fr', 'EN' => 'en']),
-            ImageField::new('filename')->setUploadDir(DownloadableFile::getUploadDir())
+            TextField::new('file')->setFormType(VichImageType::class)/*->setUploadDir(Document::getUploadDir())
                 ->hideOnIndex()
                 ->setUploadedFileNamePattern(function (UploadedFile $file) {
                   return sprintf('%s_%d.%s',
@@ -57,7 +69,7 @@ class DownloadableFileCrudController extends AbstractCrudController
                       $file->guessExtension()
                   );
                 })
-                ->setFileConstraints([]),
+                ->setFileConstraints([])*/,
             BooleanField::new('isFolder') ,
             BooleanField::new('sensible'),
             DateTimeField::new('creationDate')->hideOnForm()->setFormat('dd/MM/yyyy'),
@@ -72,7 +84,7 @@ class DownloadableFileCrudController extends AbstractCrudController
     {
         $viewFile = Action::new('viewFile', 'Lien', 'fa fa-link')
             ->setTemplatePath('admin/copyLinkAction.html.twig')
-            ->linkToUrl(function (DownloadableFile $file) {
+            ->linkToUrl(function (Document $file) {
                 return $this->getDownloadUrl($file);
             })
             ->displayAsLink();
@@ -83,7 +95,7 @@ class DownloadableFileCrudController extends AbstractCrudController
 
     public function createEntity(string $entityFqcn)
     {
-        $entity = new DownloadableFile();
+        $entity = new Document();
         $entity->setCreationDate(new \DateTime('now'));
         $entity->setFileModificationDate(new \DateTime('now'));
         return $entity;
@@ -99,7 +111,7 @@ class DownloadableFileCrudController extends AbstractCrudController
         parent::persistEntity($em, $entity);
     }
 
-    protected function getDownloadUrl(DownloadableFile $file): string
+    protected function getDownloadUrl(Document $file): string
     {
         if ($file->getSensible()) {
             $url = $this->generateUrl('dl_item_signed', ['token' => $file->getToken()]);
@@ -119,4 +131,27 @@ class DownloadableFileCrudController extends AbstractCrudController
             ->addJsFile('js/admin.js')
             ->addCssFile('css/admin.css');
     }
+
+    /*protected function getRedirectResponseAfterSave(AdminContext $context, string $action): RedirectResponse
+    {
+
+        $tag = $context->getEntity()->getInstance();
+        $adminUrlGenerator = $this->container->get(AdminUrlGenerator::class);
+
+        if ($tag->isPublic() && $tag->isEditable()) {
+            $url = $adminUrlGenerator
+                ->setAction(Action::EDIT)
+                ->setEntityId($tag->getId())
+                ->generateUrl()
+            ;
+
+            return $this->redirect($url);
+        }
+
+        if ($tag->isPublic()) {
+            return $this->redirect('https://google.com');
+        }
+
+        return parent::getRedirectResponseAfterSave($context, $action);
+    }*/
 }

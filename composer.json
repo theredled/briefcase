@@ -9,6 +9,8 @@
         "php": ">=8.3",
         "ext-ctype": "*",
         "ext-iconv": "*",
+        "ext-intl": "*",
+        "ext-zip": "*",
         "doctrine/doctrine-bundle": "^2.8",
         "doctrine/doctrine-migrations-bundle": "^3.2",
         "doctrine/orm": "^2.14",
@@ -24,8 +26,7 @@
         "symfony/runtime": "6.4.*",
         "symfony/yaml": "6.4.*",
         "tilleuls/url-signer-bundle": "^2.2",
-      "ext-zip": "*",
-      "ext-intl": "*"
+        "vich/uploader-bundle": "^2.6"
     },
     "config": {
         "allow-plugins": {

@@ -3,7 +3,7 @@
 namespace App\Controller;
 
 use App\Entity\Download;
-use App\Entity\DownloadableFile;
+use App\Entity\Document;
 use CoopTilleuls\UrlSignerBundle\UrlSigner\UrlSignerInterface;
 use Doctrine\Persistence\ManagerRegistry;
 use Spatie\UrlSigner\Support\Url;

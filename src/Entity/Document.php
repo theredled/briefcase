@@ -2,25 +2,28 @@
 
 namespace App\Entity;
 
-use App\Repository\DownloadableFileRepository;
+use App\Repository\DocumentRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Event\PreUpdateEventArgs;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\HttpFoundation\File\File;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Vich\UploaderBundle\Mapping\Annotation as Vich;
 
-#[ORM\Entity(repositoryClass: DownloadableFileRepository::class)]
+#[ORM\Entity(repositoryClass: DocumentRepository::class)]
+#[ORM\Table(name: 'downloadable_file')]
 #[ORM\HasLifecycleCallbacks]
-class DownloadableFile
+#[Vich\Uploadable]
+class Document
 {
-
-
-    public function getFileModificationDate(): ?\DateTime
+    public function getFileModificationDate(): ?\DateTimeImmutable
     {
         return $this->fileModificationDate;
     }
 
-    public function getCalcFileModificationDate($project_dir): ?\DateTime
+    public function getCalcFileModificationDate($project_dir): ?\DateTimeImmutable
     {
         if ($this->fileModificationDate)
             return $this->fileModificationDate;
@@ -28,10 +31,10 @@ class DownloadableFile
             $absPath = $project_dir . '/' . self::getUploadDir() . '/' . $this->getFilename();
             if (!file_exists($absPath))
                 return null;
-            return (new \DateTime())->setTimestamp(filemtime($absPath));
+            return (new \DateTimeImmutable())->setTimestamp(filemtime($absPath));
         }
         else
-            return new \DateTime('now');
+            return new \DateTimeImmutable('now');
     }
 
     #[ORM\PreUpdate]
@@ -48,7 +51,7 @@ class DownloadableFile
         }
 
         if ($changed)
-            $this->setFileModificationDate(new \DateTime('now'));
+            $this->setFileModificationDate(new \DateTimeImmutable());
     }
 
     public function getDownloadExtension()
@@ -72,16 +75,18 @@ class DownloadableFile
     #[ORM\Column]
     private ?int $id = null;
 
+    /**#[ORM\Column(length: 255, nullable: true)]*/
+    #[Vich\UploadableField(mapping: 'documents', fileNameProperty: 'filename')]
+    private ?File $file = null;
 
-
-    #[ORM\Column(length: 255, nullable: true)]
+    #[ORM\Column(nullable: true)]
     private ?string $filename = null;
 
-    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
-    private ?\DateTime $creationDate = null;
+    #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true)]
+    private ?\DateTimeImmutable $creationDate = null;
 
-    #[ORM\Column(type: Types::DATETIME_MUTABLE, nullable: true)]
-    private ?\DateTime $fileModificationDate = null;
+    #[ORM\Column(type: Types::DATETIME_IMMUTABLE, nullable: true)]
+    private ?\DateTimeImmutable $fileModificationDate = null;
 
     #[ORM\Column(length: 255)]
     private ?string $token = null;
@@ -104,14 +109,17 @@ class DownloadableFile
     /**
      * @var Collection<int, self>
      */
-    #[ORM\ManyToMany(targetEntity: self::class, inversedBy: 'Containers')]
+    #[ORM\ManyToMany(targetEntity: self::class, inversedBy: 'DocumentContainers')]
+    #[ORM\JoinTable(name: 'downloadable_file_downloadable_file')]
+    #[ORM\JoinColumn(name: 'downloadable_file_target', referencedColumnName: 'id', onDelete: 'CASCADE')]
+    #[ORM\InverseJoinColumn(name: 'downloadable_file_source', referencedColumnName: 'id', onDelete: 'CASCADE')]
     private Collection $IncludedFiles;
 
     /**
      * @var Collection<int, self>
      */
     #[ORM\ManyToMany(targetEntity: self::class, mappedBy: 'IncludedFiles')]
-    private Collection $Containers;
+    private Collection $DocumentContainers;
 
     public function __toString()
     {
@@ -124,7 +132,7 @@ class DownloadableFile
     {
         $this->Downloads = new ArrayCollection();
         $this->IncludedFiles = new ArrayCollection();
-        $this->DownloadableContainer = new ArrayCollection();
+        $this->DocumentContainers = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -137,7 +145,7 @@ class DownloadableFile
         return $this->filename;
     }
 
-    public function setFilename(string $filename): self
+    public function setFilename(?string $filename): self
     {
         $this->filename = $filename;
 
@@ -242,17 +250,17 @@ class DownloadableFile
     }
 
 
-    public function setFileModificationDate(?\DateTime $fileModificationDate): void
+    public function setFileModificationDate(?\DateTimeImmutable $fileModificationDate): void
     {
         $this->fileModificationDate = $fileModificationDate;
     }
 
-    public function getCreationDate(): ?\DateTime
+    public function getCreationDate(): ?\DateTimeImmutable
     {
         return $this->creationDate;
     }
 
-    public function setCreationDate(?\DateTime $creationDate): void
+    public function setCreationDate(?\DateTimeImmutable $creationDate): void
     {
         $this->creationDate = $creationDate;
     }
@@ -284,27 +292,45 @@ class DownloadableFile
     /**
      * @return Collection<int, self>
      */
-    public function getDownloadableContainer(): Collection
+    public function getDocumentContainers(): Collection
     {
-        return $this->DownloadableContainer;
+        return $this->DocumentContainers;
     }
 
-    public function addDownloadbleContainer(self $downloadbleContainer): static
+    public function addDocumentContainer(self $downloadbleContainer): static
     {
-        if (!$this->DownloadableContainer->contains($downloadbleContainer)) {
-            $this->DownloadableContainer->add($downloadbleContainer);
+        if (!$this->DocumentContainers->contains($downloadbleContainer)) {
+            $this->DocumentContainers->add($downloadbleContainer);
             $downloadbleContainer->addIncludedFile($this);
         }
 
         return $this;
     }
 
-    public function removeDownloadbleContainer(self $downloadbleContainer): static
+    public function removeDocumentContainer(self $downloadbleContainer): static
     {
-        if ($this->DownloadableContainer->removeElement($downloadbleContainer)) {
+        if ($this->DocumentContainers->removeElement($downloadbleContainer)) {
             $downloadbleContainer->removeIncludedFile($this);
         }
 
         return $this;
+    }
+
+
+    public function getFile(): UploadedFile|File|null
+    {
+        return $this->file;
+    }
+
+    public function setFile(UploadedFile|File|null $file)
+    {
+        $this->file = $file;
+
+
+        if (null !== $file) {
+            // It is required that at least one field changes if you are using doctrine
+            // otherwise the event listeners won't be called and the file is lost
+            $this->fileModificationDate = new \DateTimeImmutable();
+        }
     }
 }
