@@ -1,6 +1,8 @@
+@import "@fortawesome/fontawesome-free/css/all.css";
+
 @font-face {
     font-family: "American Typewriter";
-    src: local('American Typewriter'), url('fonts/americantypewriter_1-webfont.ttf') format('truetype');
+    src: local('American Typewriter'), url('../fonts/americantypewriter_1-webfont.ttf') format('truetype');
 }
 
 body {margin: 0px 0; padding: 0; font-family: "Helvetica Neue",Arial,sans-serif; /*font-family: Helvetica, sans-serif;*/ font-size: 13px;

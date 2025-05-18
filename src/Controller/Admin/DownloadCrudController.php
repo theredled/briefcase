@@ -26,9 +26,9 @@ class DownloadCrudController extends AbstractCrudController
         return [
             //IdField::new('id'),
             DateTimeField::new('date')->setFormat('dd/MM/yyyy HH:mm'),
-            AssociationField::new('File'),
-            TextField::new('fileName'),
-            DateTimeField::new('fileModificationDate')->setFormat('dd/MM/yyyy'),
+            AssociationField::new('File', 'Document'),
+            TextField::new('fileName', 'Fichier original'),
+            DateTimeField::new('fileModificationDate', 'Date fichier')->setFormat('dd/MM/yyyy'),
             TextField::new('ip'),
             TextareaField::new('infos')->onlyOnDetail(),
         ];
@@ -44,6 +44,10 @@ class DownloadCrudController extends AbstractCrudController
     }
 
     public function configureCrud(Crud $crud): Crud {
-        return $crud->setDefaultSort(['id' => 'DESC']);
+        return $crud->setDefaultSort(['id' => 'DESC'])
+            ->setEntityLabelInSingular('Téléchargement')
+            ->setEntityLabelInPlural('Téléchargements')
+            ->setPageTitle(Crud::PAGE_INDEX, 'Historique des téléchargements');
     }
+
 }

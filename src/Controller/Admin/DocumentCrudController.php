@@ -44,7 +44,9 @@ class DocumentCrudController extends AbstractCrudController
     public function configureCrud(Crud $crud): Crud
     {
         return $crud->setDefaultSort(['sensible' => 'DESC', 'token' => 'ASC'])
-            ->showEntityActionsInlined();
+            ->setEntityLabelInSingular('Document')
+            ->setEntityLabelInPlural('Documents')
+           ;
     }
 
     #[Route('/admin_view_file/{filename}', name: 'admin_view_file')]
@@ -57,10 +59,10 @@ class DocumentCrudController extends AbstractCrudController
     public function configureFields(string $pageName): iterable
     {
         return [
-            TextField::new('token'),
-            TextField::new('name'),
-            ChoiceField::new('lang')->setChoices(['FR' => 'fr', 'EN' => 'en']),
-            TextField::new('file')->setFormType(VichFileType::class)->hideOnIndex()
+            TextField::new('token', 'ID'),
+            TextField::new('name', 'Titre'),
+            ChoiceField::new('lang', 'Langue')->setChoices(['FR' => 'fr', 'EN' => 'en']),
+            TextField::new('file', 'Fichier')->setFormType(VichFileType::class)->hideOnIndex()
             /*->setUploadDir(Document::getUploadDir())
                 ->hideOnIndex()
                 ->setUploadedFileNamePattern(function (UploadedFile $file) {
@@ -71,11 +73,11 @@ class DocumentCrudController extends AbstractCrudController
                   );
                 })
                 ->setFileConstraints([])*/,
-            BooleanField::new('isFolder') ,
-            BooleanField::new('sensible'),
-            DateTimeField::new('creationDate')->hideOnForm()->setFormat('dd/MM/yyyy'),
-            DateTimeField::new('fileModificationDate')->hideOnForm()->setFormat('dd/MM/yyyy'),
-            AssociationField::new('IncludedFiles')->setQueryBuilder(function(QueryBuilder $qb) {
+            BooleanField::new('isFolder', 'Dossier?') ,
+            BooleanField::new('sensible', 'Sensible?'),
+            DateTimeField::new('creationDate', 'Creé')->hideOnForm()->setFormat('dd/MM/yyyy'),
+            DateTimeField::new('fileModificationDate', 'Modifié')->hideOnForm()->setFormat('dd/MM/yyyy'),
+            AssociationField::new('IncludedFiles', 'Documents inclus')->setQueryBuilder(function(QueryBuilder $qb) {
                 $qb->andWhere('entity.isFolder = FALSE');
             }),
         ];
@@ -126,10 +128,4 @@ class DocumentCrudController extends AbstractCrudController
         return $url;
     }
 
-    public function configureAssets(Assets $assets): Assets
-    {
-        return $assets
-            ->addJsFile('js/admin.js')
-            ->addCssFile('css/admin.css');
-    }
 }

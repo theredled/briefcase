@@ -6,6 +6,8 @@ use App\Entity\Download;
 use App\Entity\Document;
 use App\Entity\Video;
 use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminDashboard;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Assets;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
 use EasyCorp\Bundle\EasyAdminBundle\Config\MenuItem;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractDashboardController;
@@ -19,10 +21,6 @@ class DashboardController extends AbstractDashboardController
 {
     public function index(): Response
     {
-        //return parent::index();
-
-        // Option 1. You can make your dashboard redirect to some common page of your backend
-        //
         $adminUrlGenerator = $this->container->get(AdminUrlGenerator::class);
         return $this->redirect($adminUrlGenerator->setController(DocumentCrudController::class)->generateUrl());
 
@@ -41,13 +39,29 @@ class DashboardController extends AbstractDashboardController
     public function configureDashboard(): Dashboard
     {
         return Dashboard::new()
-            ->setTitle('FTIY');
+            ->setTitle('Briefcase')
+            ->setLocales(['fr']);
     }
-
+    public function configureCrud(): Crud
+    {
+        return Crud::new()
+            ->setDateFormat('d/m/Y')
+            //->renderContentMaximized()
+            ->renderSidebarMinimized()
+            ->setPaginatorPageSize(50)
+            ->hideNullValues()
+            ->showEntityActionsInlined();
+    }
     public function configureMenuItems(): iterable
     {
         yield MenuItem::linkToDashboard('Dashboard', 'fa fa-home');
         yield MenuItem::linkToCrud('Documents', 'fas fa-file', Document::class);
         yield MenuItem::linkToCrud('Téléchargements', 'fas fa-download', Download::class);
+    }
+
+    public function configureAssets(): Assets
+    {
+        return Assets::new()
+            ->addWebpackEncoreEntry('admin');
     }
 }
