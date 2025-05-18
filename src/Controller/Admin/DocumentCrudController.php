@@ -25,6 +25,7 @@ use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Validator\Constraints\File;
+use Vich\UploaderBundle\Form\Type\VichFileType;
 use Vich\UploaderBundle\Form\Type\VichImageType;
 
 class DocumentCrudController extends AbstractCrudController
@@ -43,8 +44,7 @@ class DocumentCrudController extends AbstractCrudController
     public function configureCrud(Crud $crud): Crud
     {
         return $crud->setDefaultSort(['sensible' => 'DESC', 'token' => 'ASC'])
-            ->showEntityActionsInlined(); // Cette ligne configure le comportement par défaut
-            ;
+            ->showEntityActionsInlined();
     }
 
     #[Route('/admin_view_file/{filename}', name: 'admin_view_file')]
@@ -60,7 +60,8 @@ class DocumentCrudController extends AbstractCrudController
             TextField::new('token'),
             TextField::new('name'),
             ChoiceField::new('lang')->setChoices(['FR' => 'fr', 'EN' => 'en']),
-            TextField::new('file')->setFormType(VichImageType::class)/*->setUploadDir(Document::getUploadDir())
+            TextField::new('file')->setFormType(VichFileType::class)->hideOnIndex()
+            /*->setUploadDir(Document::getUploadDir())
                 ->hideOnIndex()
                 ->setUploadedFileNamePattern(function (UploadedFile $file) {
                   return sprintf('%s_%d.%s',
@@ -131,27 +132,4 @@ class DocumentCrudController extends AbstractCrudController
             ->addJsFile('js/admin.js')
             ->addCssFile('css/admin.css');
     }
-
-    /*protected function getRedirectResponseAfterSave(AdminContext $context, string $action): RedirectResponse
-    {
-
-        $tag = $context->getEntity()->getInstance();
-        $adminUrlGenerator = $this->container->get(AdminUrlGenerator::class);
-
-        if ($tag->isPublic() && $tag->isEditable()) {
-            $url = $adminUrlGenerator
-                ->setAction(Action::EDIT)
-                ->setEntityId($tag->getId())
-                ->generateUrl()
-            ;
-
-            return $this->redirect($url);
-        }
-
-        if ($tag->isPublic()) {
-            return $this->redirect('https://google.com');
-        }
-
-        return parent::getRedirectResponseAfterSave($context, $action);
-    }*/
 }

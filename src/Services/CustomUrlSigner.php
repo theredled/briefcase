@@ -1,5 +1,5 @@
 <?php
-namespace App\UrlSigner;
+namespace App\Services;
 
 use CoopTilleuls\UrlSignerBundle\UrlSigner\AbstractUrlSigner;
 

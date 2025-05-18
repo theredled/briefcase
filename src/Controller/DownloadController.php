@@ -25,7 +25,7 @@ use \ZipArchive;
 class DownloadController extends AbstractController
 {
 
-    #[Route('/', name: 'dl_fairyfiles_index', host: 'fairyfiles.ovh')]
+    #[Route('/', name: 'home')]
     #[Route('/dl/', name: 'dl_index')]
     public function dlIndex(Request $request, ManagerRegistry $doctrine): Response
     {

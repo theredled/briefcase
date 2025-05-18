@@ -18,25 +18,4 @@ use Symfony\Component\Routing\Annotation\Route;
 class MainController extends AbstractController
 {
 
-    #[Route('/',
-        name: 'home',
-         condition: 'request.getHttpHost() != "cv-benoit-guchet.fairyfiles.ovh" && request.getHttpHost() != "fairyfiles.ovh"'
-    )]
-    public function index(Request $request): Response
-    {
-        return $this->render('main/index.html.twig', [
-            'lang' => $this->getLang($request),
-            'controller_name' => 'MainController',
-        ]);
-    }
-
-    protected function getLang(Request $request, $available = ['fr', 'en'])
-    {
-        $lang = $request->get('lang', $request->getPreferredLanguage($available));
-        if (in_array($lang, $available))
-            return $lang;
-        else
-            return $available[0];
-    }
-
 }
