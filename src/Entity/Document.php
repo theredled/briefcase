@@ -18,6 +18,9 @@ use Vich\UploaderBundle\Mapping\Annotation as Vich;
 #[Vich\Uploadable]
 class Document
 {
+    public ?string $mimeType;
+    public ?string $faCssClass;
+
     public function getFileModificationDate(): ?\DateTimeImmutable
     {
         return $this->fileModificationDate;

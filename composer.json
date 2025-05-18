@@ -16,16 +16,16 @@
         "doctrine/orm": "^2.14",
         "easycorp/easyadmin-bundle": "^4.5",
         "symfony/apache-pack": "^1.0",
-        "symfony/console": "6.4.*",
-        "symfony/dotenv": "6.4.*",
-        "symfony/expression-language": "6.4.*",
+        "symfony/console": "7.2.*",
+        "symfony/dotenv": "7.2.*",
+        "symfony/expression-language": "7.2.*",
         "symfony/flex": "^2",
-        "symfony/framework-bundle": "6.4.*",
-        "symfony/mime": "6.4.*",
-        "symfony/password-hasher": "6.4.*",
-        "symfony/runtime": "6.4.*",
+        "symfony/framework-bundle": "7.2.*",
+        "symfony/mime": "7.2.*",
+        "symfony/password-hasher": "7.2.*",
+        "symfony/runtime": "7.2.*",
         "symfony/webpack-encore-bundle": "^2.2",
-        "symfony/yaml": "6.4.*",
+        "symfony/yaml": "7.2.*",
         "tilleuls/url-signer-bundle": "^2.2",
         "vich/uploader-bundle": "^2.6"
     },
@@ -74,14 +74,14 @@
     "extra": {
         "symfony": {
             "allow-contrib": false,
-            "require": "6.4.*"
+            "require": "7.2.*"
         }
     },
     "require-dev": {
         "doctrine/doctrine-fixtures-bundle": "^4.1",
         "symfony/maker-bundle": "^1.48",
-        "symfony/stopwatch": "6.4.*",
-        "symfony/web-profiler-bundle": "6.4.*",
+        "symfony/stopwatch": "7.2.*",
+        "symfony/web-profiler-bundle": "7.2.*",
         "zenstruck/foundry": "^2.4"
     }
 }
