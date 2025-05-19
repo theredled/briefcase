@@ -12,12 +12,15 @@ namespace Bg\MiscBundle\Helper;
 
 class Url
 {
-    static public function changeUrlParams(string $uri, array $newVars)
+    static public function changeUrlParams(string $uri, array $newVars, array $removeVars = []): string
     {
         $parts = parse_url($uri);
         $parts['query'] = isset($parts['query']) ? $parts['query'] : '';
         parse_str($parts['query'], $vars);
         $vars = array_merge($vars, $newVars);
+        foreach ($removeVars as $value) {
+            unset($vars[$value]);
+        }
         $newUri = self::buildUrl($parts, $vars);
         return $newUri;
     }

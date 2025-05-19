@@ -92,6 +92,8 @@ class DownloadTest extends WebTestCase
         $uriSigner = static::getContainer()->get(UriSigner::class);
         $signedUri = $uriSigner->sign($absoluteUri);
         $crawler = $this->client->request('GET', $signedUri);
+        $newUrl = $this->assertPreviewWorks();
+        $crawler = $this->client->request('GET', $newUrl);
         $this->assertResponseIsSuccessful();
     }
 

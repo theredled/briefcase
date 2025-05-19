@@ -23,7 +23,9 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\ImageField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\HttpFoundation\UriSigner;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Validator\Constraints\File;
 use Vich\UploaderBundle\Form\Type\VichFileType;
 use Vich\UploaderBundle\Form\Type\VichImageType;
@@ -31,7 +33,7 @@ use Vich\UploaderBundle\Form\Type\VichImageType;
 class DocumentCrudController extends AbstractCrudController
 {
     public function __construct(
-        private UrlSignerInterface $urlSigner,
+        protected UriSigner $uriSigner,
     )
     {
     }
@@ -52,7 +54,7 @@ class DocumentCrudController extends AbstractCrudController
     #[Route('/admin_view_file/{filename}', name: 'admin_view_file')]
     public function viewFileAction($filename)
     {
-        $path = $this->getParameter('project_dir').'/'.Document::getUploadDir().'/'.$filename;
+        $path = Document::getUploadDir().'/'.$filename;
         return new BinaryFileResponse($path);
     }
 
@@ -116,14 +118,10 @@ class DocumentCrudController extends AbstractCrudController
 
     protected function getDownloadUrl(Document $file): string
     {
-        if ($file->getSensible()) {
-            $url = $this->generateUrl('dl_item_signed', ['token' => $file->getToken()]);
-            $url = $this->urlSigner->sign($url);
-        } else
-            $url = $this->generateUrl('dl_anything', [
-                'token' => $file->getToken(),
-                //'ext' => $file->getDownloadExtension()
-            ]);
+        $url = $this->generateUrl('dl_anything', ['token' => $file->getToken()], UrlGeneratorInterface::ABSOLUTE_URL);
+
+        if ($file->getSensible())
+            $url = $this->uriSigner->sign($url);
 
         return $url;
     }

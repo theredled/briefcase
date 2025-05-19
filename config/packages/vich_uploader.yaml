@@ -7,5 +7,5 @@ vich_uploader:
     mappings:
       documents:
         uri_prefix: /admin_view_file
-        upload_destination: '%kernel.project_dir%/var/downloadable_files'
+        upload_destination: '%uploaded_files_dir%'
         namer: App\Services\UploadedFileNamer

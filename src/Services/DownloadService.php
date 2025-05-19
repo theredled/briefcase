@@ -11,6 +11,7 @@ namespace App\Services;
 
 
 use App\Entity\Document;
+use Bg\MiscBundle\Helper\Url;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Filesystem\Filesystem;
@@ -96,7 +97,7 @@ class DownloadService implements EventSubscriberInterface
 
         if (!$document)
             throw new NotFoundHttpException('Fichier non trouvé : ' . $token);
-        if ($document->getSensible() and !$this->uriSigner->checkRequest($request))
+        if ($document->getSensible() and !$this->uriSignerCheckRequest($request))
             throw new AccessDeniedHttpException('Lien non valide ou expiré : ' . $token);
 
         return $document;
@@ -148,6 +149,14 @@ class DownloadService implements EventSubscriberInterface
         return $defaultClass;
     }
 
+    public function uriSignerCheckRequest(Request $request): bool
+    {
+        $qs = ($qs = $request->server->get('QUERY_STRING')) ? '?'.$qs : '';
+        $uri = $request->getSchemeAndHttpHost().$request->getBaseUrl().$request->getPathInfo().$qs;
+        $uri = Url::changeUrlParams($uri, [], ['dl']);
+
+        return $this->uriSigner->check($uri);
+    }
 
     static public function getSubscribedEvents(): array
     {
