@@ -6,6 +6,8 @@ use App\Entity\Download;
 use App\Entity\Document;
 use App\Entity\Video;
 use EasyCorp\Bundle\EasyAdminBundle\Attribute\AdminDashboard;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
+use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Assets;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Dashboard;
@@ -42,6 +44,13 @@ class DashboardController extends AbstractDashboardController
             ->setTitle('Briefcase')
             ->setLocales(['fr']);
     }
+
+    public function configureActions(): Actions
+    {
+        return parent::configureActions()->update(Crud::PAGE_INDEX, Action::NEW,
+            fn(Action $action) => $action->setIcon('fa fa-plus')->setLabel(false));
+    }
+
     public function configureCrud(): Crud
     {
         return Crud::new()
@@ -52,6 +61,7 @@ class DashboardController extends AbstractDashboardController
             ->hideNullValues()
             ->showEntityActionsInlined();
     }
+
     public function configureMenuItems(): iterable
     {
         yield MenuItem::linkToDashboard('Dashboard', 'fa fa-home');

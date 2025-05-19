@@ -99,8 +99,8 @@ class DocumentCrudController extends AbstractCrudController
     public function createEntity(string $entityFqcn)
     {
         $entity = new Document();
-        $entity->setCreationDate(new \DateTime('now'));
-        $entity->setFileModificationDate(new \DateTime('now'));
+        $entity->setCreationDate(new \DateTimeImmutable());
+        $entity->setFileModificationDate(new \DateTimeImmutable());
         return $entity;
     }
 

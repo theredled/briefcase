@@ -17,9 +17,13 @@ use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\File\Exception\AccessDeniedException;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\UriSigner;
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Core\Signature\Exception\InvalidSignatureException;
 use \ZipArchive;
 
 class DownloadController extends AbstractController
@@ -48,9 +52,9 @@ class DownloadController extends AbstractController
     #[Route('/dl/{token}', name: 'dl_item')]
     #[Route('/do_dl_signed/{token}', name: 'do_dl_signed', defaults: ['dl' => 1, '_signed' => true])]
     #[Route('/dl_signed/{token}', name: 'dl_item_signed', defaults: ['_signed' => true])]
-    public function dlItem($token, Request $request, ManagerRegistry $doctrine, UrlSignerInterface $urlSigner): Response
+    public function dlItem($token, Request $request, ManagerRegistry $doctrine, UriSigner $uriSigner): Response
     {
-        $fileEntity = $this->findEntity($token, $doctrine, $request);
+        $fileEntity = $this->findEntity($token, $doctrine, $request, $uriSigner);
 
         //-- DL direct
         if ($request->get('dl') or $request->get('inline')) {
@@ -68,7 +72,7 @@ class DownloadController extends AbstractController
             return $this->render('main/dlPreview.html.twig', [
                 'item' => $fileEntity,
                 'dl_url' => $request->get('_signed')
-                    ? $urlSigner->sign($this->generateUrl('do_dl_signed', ['token' => $token]))
+                    ? $uriSigner->sign($this->generateUrl('dl_anything', ['token' => $token]))
                     : '?dl=1',
                 'do_redirect' => true
             ]);
@@ -89,23 +93,21 @@ class DownloadController extends AbstractController
         $lang = $this->getLang($request, ['fr']);
         //var_dump(__METHOD__);exit;
 
-        $fileEntity = $doctrine->getRepository(Document::class)->findOneBy(['token' => $token, 'lang' => $lang]);
-        if (!$fileEntity)
-            $fileEntity = $doctrine->getRepository(Document::class)->findOneBy(['token' => $token]);
-        if (!$fileEntity)
+        $document = $doctrine->getRepository(Document::class)->findOneBy(['token' => $token, 'lang' => $lang]);
+        if (!$document)
+            $document = $doctrine->getRepository(Document::class)->findOneBy(['token' => $token]);
+        if (!$document)
             return $this->redirectToRoute('dl_index');
 
-        $dirname = $token.'_'.$fileEntity->getLang();
+        $dirname = $token.'_'.$document->getLang();
         $path = $this->getParameter('web_dir').'/dl/'.$dirname;
         $filesInFolder = glob($path.'/*.*');
         $filesystem->mkdir($this->getParameter('zip_cache_dir'));
         $zipPath = $this->getParameter('zip_cache_dir').'/'.$dirname.'.zip';
 
         //-- Fichers dans le dossier + fichiers liés
-        $allFiles = array_merge($filesInFolder, $fileEntity->getIncludedFiles()->toArray());
-        $filesAreAhead = !is_file($zipPath)
-            || $this->getLastModificationTimeInFiles($allFiles) > filemtime($zipPath)
-            || $fileEntity->getFileModificationDate()->getTimestamp() > filemtime($zipPath);
+        $allFiles = array_merge($filesInFolder, $document->getIncludedFiles()->toArray());
+        $filesAreAhead = $this->filesAreAhead($zipPath, $allFiles, $document);
 
         if ($filesAreAhead) {
             $zip = new \ZipArchive();
@@ -114,11 +116,11 @@ class DownloadController extends AbstractController
             if ($ret = $zip->open($zipPath, \ZipArchive::CREATE) !== true)
                 throw new \Exception('Erreur Zip : '.$ret.', '.$zip->getStatusString());
             $zip->addEmptyDir($dirname);
-            if (!count($filesInFolder) and $fileEntity->getIncludedFiles()->count() == 0)
+            if (!count($filesInFolder) and $document->getIncludedFiles()->count() == 0)
                 throw new \Exception('No files in '.$path);
             foreach ($filesInFolder as $file)
                 $zip->addFile($file, $dirname.'/'.basename($file));
-            foreach ($fileEntity->getIncludedFiles() as $includedFile)
+            foreach ($document->getIncludedFiles() as $includedFile)
                 $zip->addFile(
                     $this->getParameter('project_dir').'/'.$includedFile->getRelativePath(),
                     $dirname.'/'.basename($includedFile->getDownloadFilename())
@@ -134,13 +136,15 @@ class DownloadController extends AbstractController
     #[Route('/d/{token}.{ext}', name: 'dl_anything_ext')]
     #[Route('/d/{lang}/{token}}', name: 'dl_anything_lang')]
     #[Route('/d/{lang}/{token}.{ext}', name: 'dl_anything_lang_ext')]
-    public function dlAnything($token, Request $request, ManagerRegistry $doctrine)
+    public function dlAnything($token, Request $request, ManagerRegistry $doctrine, UriSigner $signer, Filesystem $filesystem): Response
     {
-        $fileEntity = $this->findEntity($token, $doctrine, $request);
-        if ($fileEntity->isFolder())
-            return $this->redirectToRoute('dl_folder', ['token' => $token]);
+        $document = $this->findEntity($token, $doctrine, $request, $signer);
+
+        if ($document->isFolder())
+            return $this->dlFolder($token, $request, $filesystem, $doctrine);
         else
-            return $this->redirectToRoute('dl_item', ['token' => $token]);
+            return $this->dlItem($token, $request, $doctrine, $signer);
+            //return $this->redirectToRoute('dl_item', ['token' => $token]);
     }
 
     protected function getLastModificationTimeInFiles(array $files)
@@ -227,20 +231,32 @@ class DownloadController extends AbstractController
      * @param mixed $lang
      * @return Document|object|null
      */
-    protected function findEntity($token, ManagerRegistry $doctrine, Request $request): null|Document
+    protected function findEntity($token, ManagerRegistry $doctrine, Request $request, UriSigner $signer): null|Document
     {
         $lang = $this->getLang($request);
 
-        $fileEntity = $doctrine->getRepository(Document::class)->findOneBy(['token' => $token, 'lang' => $lang]);
-        if (!$fileEntity)
-            $fileEntity = $doctrine->getRepository(Document::class)->findOneBy(['token' => $token]);
+        $document = $doctrine->getRepository(Document::class)->findOneBy(['token' => $token, 'lang' => $lang]);
+        if (!$document)
+            $document = $doctrine->getRepository(Document::class)->findOneBy(['token' => $token]);
 
-        if (!$fileEntity)
-            throw $this->createAccessDeniedException('Fichier non trouvé : '.$token);
-        if ($fileEntity->getSensible() and !$request->get('_signed'))
-            throw $this->createAccessDeniedException('Lien expiré : '.$token);
+        if (!$document)
+            throw $this->createNotFoundException('Fichier non trouvé : '.$token);
+        if ($document->getSensible() and !$signer->checkRequest($request))
+            throw new AccessDeniedHttpException('Lien non valide ou expiré : '.$token);
 
-        return $fileEntity;
+        return $document;
+    }
+
+
+    protected function filesAreAhead(string $zipPath, false|array $allFiles, Document $doc): bool
+    {
+        if (!is_file($zipPath))
+            return true;
+        elseif ($this->getLastModificationTimeInFiles($allFiles) > filemtime($zipPath))
+            return true;
+        elseif ($doc->getFileModificationDate() && $doc->getFileModificationDate()->getTimestamp() > filemtime($zipPath))
+            return true;
+        return false;
     }
 
 }
