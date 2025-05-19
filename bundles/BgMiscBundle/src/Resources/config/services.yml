@@ -1,0 +1,64 @@
+services:
+    _defaults:
+        autowire: true
+        autoconfigure: true
+
+    BgBundle\:
+        resource: '../../*'
+        exclude:
+            - '../../Doctrine'
+            - '../../Entity'
+            - '../../Form/EntityToIdTransformer*'
+            - '../../Form/EntityToLabelTransformer*'
+            - '../../Repository'
+            - '../../Tests'
+
+    BgBundle\Controller\:
+        resource: '../../Controller/'
+        tags: ['controller.service_arguments']
+
+    BgBundle\Twig\BgTwigExtension:
+        arguments: ["%kernel.root_dir%"]
+
+    BgBundle\LiipImagine\NotFoundLoader:
+        arguments:
+            $dataRoots: "%data_dir%"
+        tags:
+            - { name: "liip_imagine.binary.loader", loader: not_found_loader }
+
+    BgBundle\LiipImagine\SessionPermissionResolver:
+        arguments:
+            $salt: "%secret%"
+            $cacheDir: "%kernel.root_dir%/../var/cache/media"
+            $scriptPrefix: "media_auth.php"
+            $env: "%kernel.environment%"
+        tags:
+            - { name: "liip_imagine.cache.resolver", resolver: session_permission_resolver }
+
+    liip_imagine.cache.manager:
+        class: BgBundle\LiipImagine\BgCacheManager
+        public: true
+        arguments:
+            $filterConfig: "@liip_imagine.filter.configuration"
+            $signer: "@liip_imagine.cache.signer"
+            $defaultResolver: '%liip_imagine.cache.resolver.default%'
+        calls:
+            - [setFilter, ["@liip_imagine.service.filter"]]
+    #Do NOT alias id to FQCN, as it will override original Cache Manager.
+    BgBundle\LiipImagine\BgCacheManager: '@liip_imagine.cache.manager'
+
+    BgBundle\Controller\ImagineSessionPermissionController:
+        arguments:
+            $filterService: "@liip_imagine.service.filter"
+            $dataManager: "@liip_imagine.data.manager"
+            $signer: "@liip_imagine.cache.signer"
+        calls:
+            - [ setCacheManager,[ '@liip_imagine.cache.manager' ] ]
+        tags: ['controller.service_arguments']
+
+    liip_imagine.controller.session_permission:
+        public: true
+        alias: BgBundle\Controller\ImagineSessionPermissionController
+
+    liip_imagine.templating.filter_extension:
+        alias: BgBundle\LiipImagine\BgFilterExtension

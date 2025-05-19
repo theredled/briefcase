@@ -29,6 +29,12 @@
         "tilleuls/url-signer-bundle": "^2.2",
         "vich/uploader-bundle": "^2.6"
     },
+    "repositories": [
+        {
+            "type": "path",
+            "url": "./bundles/BgMiscBundle"
+        }
+    ],
     "config": {
         "allow-plugins": {
             "php-http/discovery": true,
@@ -39,7 +45,8 @@
     },
     "autoload": {
         "psr-4": {
-            "App\\": "src/"
+            "App\\": "src/",
+            "Bg\\MiscBundle\\": "bundles/BgMiscBundle/src/"
         }
     },
     "autoload-dev": {

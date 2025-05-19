@@ -6,7 +6,9 @@
 parameters:
     web_dir: '%env(DOCUMENT_ROOT)%'
     project_dir: '%kernel.project_dir%'
-    zip_cache_dir: '%kernel.project_dir%/var/cache/zip'
+    zips_dir: '%kernel.project_dir%/var/cache/zip'
+    folders_dir: '%web_dir%/dl'
+    uploaded_files_dir: '%kernel.project_dir%/var/downloadable_files'
 
 services:
     # default configuration for services in *this* file
@@ -27,3 +29,10 @@ services:
         public: true
     # add more service definitions when explicit configuration is needed
     # please note that last definitions always *replace* previous ones
+
+    App\Services\DownloadService:
+        arguments:
+            $zipsDir: '%zips_dir%'
+            $foldersDir: '%folders_dir%'
+            $filesDir: '%uploaded_files_dir%'
+        tags: [kernel.event_listener]

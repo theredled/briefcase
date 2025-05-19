@@ -8,6 +8,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Event\PreUpdateEventArgs;
 use Doctrine\ORM\Mapping as ORM;
+use Exception;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Vich\UploaderBundle\Mapping\Annotation as Vich;
@@ -26,12 +27,31 @@ class Document
         return $this->fileModificationDate;
     }
 
-    public function getCalcFileModificationDate($project_dir): ?\DateTimeImmutable
+    protected static ?string $dataDir;
+
+    public static function setDataDir($dir): void
+    {
+        self::$dataDir = $dir;
+    }
+
+    public function getDataDir(): ?string
+    {
+        return self::$dataDir;
+    }
+
+    public function getAbsolutePath(): string
+    {
+        if (!self::$dataDir)
+            throw new Exception('Data dir non défini.');
+        return self::$dataDir.'/'.$this->getFileName();
+    }
+
+    public function getCalcFileModificationDate(): ?\DateTimeImmutable
     {
         if ($this->fileModificationDate)
             return $this->fileModificationDate;
-        elseif ($project_dir) {
-            $absPath = $project_dir . '/' . self::getUploadDir() . '/' . $this->getFilename();
+        elseif ($this->getDataDir()) {
+            $absPath = $this->getDataDir() . '/' . $this->getFilename();
             if (!file_exists($absPath))
                 return null;
             return (new \DateTimeImmutable())->setTimestamp(filemtime($absPath));
@@ -71,6 +91,18 @@ class Document
         $date = $this->fileModificationDate;
         //return str_replace(' ', '-', $this->getName()).($date ? '-'.$date->format('Ymd') : '').'.'.$this->getDownloadExtension();
         return $this->getName().($date ? ' ('.$date->format('Ymd').')' : '').'.'.$this->getDownloadExtension();
+    }
+
+    public function getRelativePath()
+    {
+        return self::getUploadDir().'/'.$this->getFilename();
+    }
+
+    static public function getUploadDir() {
+        if (self::$dataDir)
+            throw new Exception('Data dir non défini');
+        return self::$dataDir;
+        //return 'var/downloadable_files';
     }
 
     #[ORM\Id]
@@ -179,14 +211,6 @@ class Document
         return $this;
     }
 
-    public function getRelativePath()
-    {
-        return self::getUploadDir().'/'.$this->getFilename();
-    }
-
-    static public function getUploadDir() {
-        return 'var/downloadable_files';
-    }
 
     public function getLang()
     {
