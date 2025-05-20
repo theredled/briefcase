@@ -64,17 +64,7 @@ class DocumentCrudController extends AbstractCrudController
             TextField::new('token', 'ID'),
             TextField::new('name', 'Titre'),
             ChoiceField::new('lang', 'Langue')->setChoices(['FR' => 'fr', 'EN' => 'en']),
-            TextField::new('file', 'Fichier')->setFormType(VichFileType::class)->hideOnIndex()
-            /*->setUploadDir(Document::getUploadDir())
-                ->hideOnIndex()
-                ->setUploadedFileNamePattern(function (UploadedFile $file) {
-                  return sprintf('%s_%d.%s',
-                      preg_replace('/[^a-z0-9._-]+/i', '-', $file->getClientOriginalName()),
-                      random_int(1, 999),
-                      $file->guessExtension()
-                  );
-                })
-                ->setFileConstraints([])*/,
+            TextField::new('file', 'Fichier')->setFormType(VichFileType::class)->hideOnIndex(),
             BooleanField::new('isFolder', 'Dossier?') ,
             BooleanField::new('sensible', 'Sensible?'),
             DateTimeField::new('creationDate', 'Creé')->hideOnForm()->setFormat('dd/MM/yyyy'),
@@ -88,14 +78,17 @@ class DocumentCrudController extends AbstractCrudController
     public function configureActions(Actions $actions): Actions
     {
         $viewFile = Action::new('viewFile', 'Lien', 'fa fa-link')
-            ->setTemplatePath('admin/copyLinkAction.html.twig')
+            ->setTemplatePath('main/copyLinkAction.html.twig')
             ->linkToUrl(function (Document $file) {
                 return $this->getDownloadUrl($file);
             })
             ->displayAsLink();
 
         return $actions
-            ->add(Crud::PAGE_INDEX, $viewFile);
+            ->add(Crud::PAGE_INDEX, $viewFile)
+            ->add(Crud::PAGE_EDIT, $viewFile)
+            ->add(Crud::PAGE_DETAIL, $viewFile)
+            ;
     }
 
     public function createEntity(string $entityFqcn)

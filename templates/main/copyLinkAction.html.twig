@@ -1,0 +1,7 @@
+{% set url = action is defined ? action.getLinkUrl() : url %}
+<div>
+    <p class="copy-url-success-message hidden">Lien copié !</p>
+    <a href="{{ url }}" class="copy-url-btn" data-url="{{ absolute_url(url) }}">
+        <i class="fa fa-copy"></i> <span>Copier le lien</span>
+    </a>
+</div>

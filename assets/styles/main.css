@@ -10,6 +10,7 @@ body {margin: 0px 0; padding: 0; font-family: "Helvetica Neue",Arial,sans-serif;
 * {margin: 0; padding: 0}
 #global {position: relative; width: 1000px; margin: 0 auto; }
 ul, li {list-style: none}
+.hidden {display: none; }
 
 #content {background: linear-gradient( 0deg, #aaa, #e7e7e7); /*background-color: #e7e7e7;*/ padding: 0; overflow: hidden}
 #header {/*background: #e7e7e7 no-repeat top center url(../images/Fusilli.jpg);background-position: 0 -10px;*/
@@ -23,9 +24,6 @@ a {color: black;}
 
 .col-left {width: 44%; padding: 10px 3% 10px 0; float: left; }
 .col-right {width: 52%; padding: 10px 0 10px 1%; float: left; }
-.video {padding: 5px 5px 10px}
-.video p {padding: 5px; color: #333}
-.video em {font-style: normal; font-weight: bold;}
 
 .section-h2 {padding-bottom: 10px; font-size: 26px; font-family: "American Typewriter",sans-serif; font-weight: bold}
 .section-h3 {padding-bottom: 10px; font-size: 16px; font-family: "American Typewriter",sans-serif; font-weight: bold;
@@ -60,7 +58,11 @@ a {color: black;}
 
 #downloads .section-content {padding: 3em; font-size: 15px}
 #downloads .section-content ul {display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 12px; }
-.file-item {text-align: center; width: 150px; padding: 0; }
+.file-item {text-align: center; width: 150px; padding: 0; display: flex;   flex-direction: column;
+    align-items: normal;
+    justify-content: space-between; }
+.file-item .copy-url-btn {visibility: hidden}
+.file-item:hover .copy-url-btn {visibility: visible}
 .file-item a {text-decoration: none}
 .file-item .icon {font-size: 40px; display: block}
 .file-item .title {margin-top: 10px; display: block; font-weight: bold}
