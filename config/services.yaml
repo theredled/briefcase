@@ -36,3 +36,12 @@ services:
             $foldersDir: '%folders_dir%'
             $filesDir: '%uploaded_files_dir%'
         tags: [kernel.event_listener]
+
+    #App\ApiResource\DocumentNormalizer:
+    #    decorates: 'api_platform.jsonld.normalizer.item'
+    #    arguments:
+    #        $decorated: '@App\ApiResource\DocumentNormalizer.inner'
+    #        $router: '@router'
+    #
+    #    autowire: true
+    #    autoconfigure: false

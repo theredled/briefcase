@@ -118,29 +118,34 @@ class DownloadService implements EventSubscriberInterface
 
     public function getFaCssClass(Document $fileEntity)
     {
-        $defaultClass = 'fa-file-alt';
+        return 'fa-'.$this->getFontAwesomeIconName($fileEntity);
+    }
 
-        if ($fileEntity->isFolder())
-            return 'fa-file-archive';
+    public function getFontAwesomeIconName(Document $document): string
+    {
+        $defaultClass = 'file-alt';
 
-        $absPath = $fileEntity->getAbsolutePath();
+        if ($document->isFolder())
+            return 'file-archive';
+
+        $absPath = $document->getAbsolutePath();
         if (!is_file($absPath))
             return $defaultClass;
-        $fileEntity->mimeType = mime_content_type($absPath);
+        $document->mimeType = mime_content_type($absPath);
 
-        if (!$fileEntity->mimeType)
+        if (!$document->mimeType)
             return $defaultClass;
 
-        if ($fileEntity->mimeType == 'application/pdf')
-            return 'fa-file-pdf';
+        if ($document->mimeType == 'application/pdf')
+            return 'file-pdf';
 
-        $mimePrefix = explode('/', $fileEntity->mimeType)[0];
+        $mimePrefix = explode('/', $document->mimeType)[0];
 
         $mimePrefixesToClasses = [
-            'image' => 'fa-file-image',
-            'text' => 'fa-file-alt',
-            'video' => 'fa-file-video',
-            'audio' => 'fa-file-audio',
+            'image' => 'file-image',
+            'text' => 'file-alt',
+            'video' => 'file-video',
+            'audio' => 'file-audio',
         ];
 
         if (isset($mimePrefixesToClasses[$mimePrefix]))
@@ -162,7 +167,7 @@ class DownloadService implements EventSubscriberInterface
     {
         return [
             RequestEvent::class => [
-                ['setupAbsoluteDirs', 1]
+                ['setupAbsoluteDirs', 100]
             ]
         ];
     }

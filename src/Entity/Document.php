@@ -2,6 +2,9 @@
 
 namespace App\Entity;
 
+use ApiPlatform\Metadata\ApiResource;
+use ApiPlatform\Metadata\Get;
+use ApiPlatform\Metadata\GetCollection;
 use App\Repository\DocumentRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
@@ -12,6 +15,7 @@ use Exception;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
+use Symfony\Component\Serializer\Annotation\Groups;
 use Vich\UploaderBundle\Mapping\Annotation as Vich;
 
 #[ORM\Entity(repositoryClass: DocumentRepository::class)]
@@ -21,9 +25,17 @@ use Vich\UploaderBundle\Mapping\Annotation as Vich;
 #[UniqueEntity(
     fields: ['token', 'lang']
 )]
+#[ApiResource(
+    operations: [new Get(), new GetCollection()],
+    normalizationContext: ['groups' => ['product:read']],
+    denormalizationContext: ['groups' => ['product:write']]
+)]
 class Document
 {
+    #[Groups(['product:read'])]
     public ?string $mimeType;
+
+    #[Groups(['product:read'])]
     public ?string $faCssClass;
 
     public function getFileModificationDate(): ?\DateTimeImmutable
@@ -103,7 +115,7 @@ class Document
     }
 
     static public function getUploadDir() {
-        if (self::$dataDir)
+        if (!self::$dataDir)
             throw new Exception('Data dir non défini');
         return self::$dataDir;
         //return 'var/downloadable_files';
@@ -128,21 +140,26 @@ class Document
     private ?\DateTimeImmutable $fileModificationDate = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['product:read'])]
     private ?string $token = null;
 
     #[ORM\Column(length: 255)]
+    #[Groups(['product:read'])]
     private ?string $name = null;
 
     #[ORM\Column(length: 255, nullable: true)]
+    #[Groups(['product:read'])]
     private ?string $lang = 'fr';
 
     #[ORM\OneToMany(mappedBy: 'File', targetEntity: Download::class)]
     private Collection $Downloads;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['product:read'])]
     private ?bool $isFolder = false;
 
     #[ORM\Column(nullable: true)]
+    #[Groups(['product:read'])]
     private ?bool $sensible = false;
 
     /**
@@ -271,7 +288,7 @@ class Document
 
     public function getSensible()
     {
-        return $this->sensible;
+        return (bool)$this->sensible;
     }
 
     public function setSensible(?bool $sensible)
