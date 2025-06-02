@@ -6,7 +6,7 @@
  * Date: 01/06/2025
  * Time: 16:07
  */
-namespace App\ApiResource;
+namespace App\Api;
 
 use App\Entity\Document;
 use App\Services\DownloadService;

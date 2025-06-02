@@ -14,38 +14,8 @@ use Symfony\Component\Security\Http\AccessToken\Oidc\Exception\InvalidSignatureE
 use Zenstruck\Foundry\Test\Factories;
 use Zenstruck\Foundry\Test\ResetDatabase;
 
-class DownloadTest extends WebTestCase
+class DownloadTest extends AbstractTest
 {
-    use Factories;
-    use ResetDatabase;
-
-    protected KernelBrowser $client;
-
-    protected function createNewDb(): void
-    {
-        $projectDir = self::$kernel->getProjectDir();
-        $prodDbPath = $projectDir . '/var/data.db';
-        $testDbPath = $projectDir . '/var/tests/data_test.db';
-        unlink($testDbPath);
-        copy($prodDbPath, $testDbPath);
-    }
-
-    protected function setUp(): void
-    {
-        $this->client = static::createClient();
-        $this->client->followRedirects(false);
-        $this->client->catchExceptions(false);
-        $this->createNewDb();
-        self::bootKernel();
-    }
-
-    public function testHome(): void
-    {
-        $crawler = $this->client->request('GET', '/');
-        $this->assertResponseIsSuccessful();
-        $this->assertSelectorExists('section#downloads');
-        $this->assertSelectorTextContains('section#downloads', 'Fiche technique groupe');
-    }
 
     public function testRegularPdf()
     {
@@ -121,14 +91,6 @@ class DownloadTest extends WebTestCase
     }
 
 
-    protected function assertResponseMimeTypeIs($expectedType): void
-    {
-        $this->assertResponseIsSuccessful();
-        $this->assertResponseHasHeader('Content-Type');
-        $contentType = $this->client->getResponse()->headers->get('Content-Type');
-        $mimeType = trim(explode(';', $contentType)[0]);
-        $this->assertEquals($expectedType, $mimeType);
-    }
 
     protected function assertPreviewWorks($message = '')
     {
