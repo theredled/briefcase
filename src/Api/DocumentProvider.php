@@ -13,21 +13,31 @@ use ApiPlatform\Metadata\Operation;
 use ApiPlatform\State\ProviderInterface;
 use App\Entity\Document;
 use App\Repository\DocumentRepository;
+use App\Services\UserService;
 
 class DocumentProvider implements ProviderInterface
 {
     public function __construct(
-        private DocumentRepository $repository
+        private DocumentRepository $repository,
+        protected UserService $userService
     ) {}
 
     public function provide(Operation $operation, array $uriVariables = [], array $context = []): object|null|array
     {
+        $isAuth = $this->userService->getCurrentUser();
+
         if ($operation instanceof \ApiPlatform\Metadata\GetCollection) {
-            return $this->repository->findBy(['sensible' => false]);
+            return $this->repository->findBy($isAuth ? [] : ['sensible' => false]);
         }
 
         /** @var Document $doc */
         $doc = $this->repository->find($uriVariables['id'] ?? null);
-        return $doc && !$doc->getSensible() ? $doc : null;
+
+        if (null === $doc )
+            return null;
+        elseif (!$isAuth && $doc->getSensible())
+            return null;
+        else
+            return $doc;
     }
 }

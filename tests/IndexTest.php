@@ -38,6 +38,30 @@ class IndexTest extends AbstractTest
 
         $this->assertGreaterThan(0, $allFilesCount, 'Total');
         $this->assertEquals(0, $sensibleCount, 'Sensible');
+    }
 
+    public function testAuthApiDocuments(): void
+    {
+        $this->assertEquals(0, 1, 'TODO');
+        return;
+
+        //-- login
+
+        //-- req with token
+        $crawler = $this->client->request('GET', '/api/documents');
+        $this->assertResponseIsSuccessful();
+        $this->assertResponseMimeTypeIs('application/json');
+        $json = json_decode($this->client->getResponse()->getContent(), true);
+
+        $sensibleCount = 0;
+        $allFilesCount = count($json);
+
+        foreach ($json as $file) {
+            if ($file['sensible'])
+                $sensibleCount++;
+        }
+
+        $this->assertGreaterThan(0, $allFilesCount, 'Total');
+        $this->assertGreaterThan(0, $sensibleCount, 'Sensible');
     }
 }

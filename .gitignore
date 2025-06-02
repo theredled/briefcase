@@ -31,3 +31,7 @@ yarn-error.log
 .phpunit.result.cache
 ###< phpunit/phpunit ###
 /var/tests/data_test.db
+
+###> lexik/jwt-authentication-bundle ###
+/config/jwt/*.pem
+###< lexik/jwt-authentication-bundle ###
