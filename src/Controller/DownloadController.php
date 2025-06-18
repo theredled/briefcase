@@ -55,7 +55,7 @@ class DownloadController extends AbstractController
     #[Route('/', name: 'dl_cv', defaults: ['token' => 'cv_dev', 'dl' => 1, 'inline' => 1], host: 'cv-benoit-guchet.fairyfiles.ovh')]
     #[Route('/d/{token}', name: 'dl_anything')]
     #[Route('/d/{token}.{ext}', name: 'dl_anything_ext')]
-    #[Route('/d/{lang}/{token}}', name: 'dl_anything_lang')]
+    #[Route('/d/{lang}/{token}', name: 'dl_anything_lang')]
     #[Route('/d/{lang}/{token}.{ext}', name: 'dl_anything_lang_ext')]
     public function dlAnything($token, Request $request): Response
     {

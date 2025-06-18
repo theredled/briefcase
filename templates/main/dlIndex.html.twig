@@ -10,7 +10,7 @@
         <div class="section-content">
             <ul>
             {% for item in items %}
-                {% set url = path('dl_anything_lang', {token: item.token, lang: item.lang, inline: 1}) %}
+                {% set url = path('dl_anything_lang', {token: item.token, lang: item.lang}) %}
                 <li class="file-item {{ not item.isValid ? 'invalid-item' }}" data-token="{{ item.token }}">
                     <a {% if item.isValid %}href="{{ url }}"{% endif %}>
                         <i class="far {{ item.faCssClass }} icon"></i>

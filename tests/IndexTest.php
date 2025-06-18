@@ -16,6 +16,7 @@ class IndexTest extends AbstractTest
 
     public function testHome(): void
     {
+        //-- liste-kara = invalide / 1
         $docListeKara = $this->em->getRepository(Document::class)->findOneByToken('liste-karaoklm');
         $docListeKara->setFilename('Whatever-657657657.pdf');
         $this->em->persist($docListeKara);
@@ -25,6 +26,12 @@ class IndexTest extends AbstractTest
         $this->assertResponseIsSuccessful();
         $this->assertSelectorExists('section#downloads');
         $this->assertSelectorTextContains('section#downloads', 'Fiche technique groupe');
+
+        $this->assertSelectorExists('li[data-token="presskit"]');
+        $this->assertStringEndsWith('/presskit', $crawler->filter('li[data-token="presskit"] a')->attr('href'));;
+
+
+        //-- liste-kara = invalide / 2
         $this->assertSelectorExists('li[data-token="liste-karaoklm"]');
         $this->assertSelectorExists('li.invalid-item[data-token="liste-karaoklm"]');
         $this->assertSelectorExists('li[data-token="liste-karaoklm"] .invalid-msg');
