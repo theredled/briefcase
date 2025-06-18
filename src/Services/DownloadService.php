@@ -35,8 +35,8 @@ class DownloadService implements EventSubscriberInterface
 
     public function buildZipFromFolder(Document $document)
     {
-        $dirname = $document->getToken() . '_' . $document->getLang();
-        $path = $this->filesDir . '/' . $dirname;
+        $path = $document->getFolderAbsolutePath();
+        $dirname = basename($path);
         $filesInFolder = glob($path . '/*.*');
         $this->filesystem->mkdir($this->zipsDir);
         $zipPath = $this->zipsDir . '/' . $dirname . '.zip';
@@ -115,6 +115,15 @@ class DownloadService implements EventSubscriberInterface
         return false;
     }
 
+    public function checkDocumentValidity(Document $doc)
+    {
+        if ($doc->isFolder()) {
+            return $doc->folderExists() || $doc->getIncludedFiles()->count() > 0;
+        }
+
+        return $doc->fileExists();
+    }
+
 
     public function getFaCssClass(Document $fileEntity)
     {
@@ -174,5 +183,6 @@ class DownloadService implements EventSubscriberInterface
 
     public function setupAbsoluteDirs(RequestEvent $event) {
         Document::setDataDir($this->filesDir);
+        Document::setFoldersDir($this->foldersDir);
     }
 }

@@ -40,43 +40,84 @@ class Document
     #[Groups(['product:read'])]
     public ?string $faCssClass;
 
+    #[Groups(['product:read'])]
+    public ?bool $isValid;
+
     public function getFileModificationDate(): ?\DateTimeImmutable
     {
         return $this->fileModificationDate;
     }
 
     protected static ?string $dataDir;
+    protected static ?string $foldersDir;
 
     public static function setDataDir($dir): void
     {
         self::$dataDir = $dir;
     }
 
+    public static function setFoldersDir($dir): void
+    {
+        self::$foldersDir = $dir;
+    }
+
     public function getDataDir(): ?string
     {
+        if (!self::$dataDir)
+            throw new Exception('Data dir non défini.');
+
         return self::$dataDir;
+    }
+
+    public function getFoldersDir(): ?string
+    {
+        if (!self::$foldersDir)
+            throw new Exception('Folders dir non défini.');
+
+        return self::$foldersDir;
     }
 
     public function getAbsolutePath(): string
     {
-        if (!self::$dataDir)
-            throw new Exception('Data dir non défini.');
-        return self::$dataDir.'/'.$this->getFileName();
+        return self::getDataDir().'/'.$this->getFileName();
     }
 
     public function getCalcFileModificationDate(): ?\DateTimeImmutable
     {
         if ($this->fileModificationDate)
             return $this->fileModificationDate;
-        elseif ($this->getDataDir()) {
-            $absPath = $this->getDataDir() . '/' . $this->getFilename();
-            if (!file_exists($absPath))
+        else {
+            if (!$this->fileExists())
                 return null;
+            $absPath = $this->getAbsolutePath();
+
             return (new \DateTimeImmutable())->setTimestamp(filemtime($absPath));
         }
-        else
-            return new \DateTimeImmutable('now');
     }
+
+    public function getFolderAbsolutePath(): string
+    {
+        return self::getFoldersDir().'/'.$this->getFolderName();
+    }
+
+    public function fileExists()
+    {
+        $absPath = $this->getAbsolutePath();
+        return file_exists($absPath) && is_file($absPath);
+    }
+
+    public function folderExists()
+    {
+        $absPath = $this->getFolderAbsolutePath();
+        return file_exists($absPath) && is_dir($absPath);
+    }
+
+    public function getFolderName()
+    {
+        $dirname = $this->getToken() . '_' . $this->getLang();
+        return $dirname;
+    }
+
 
     #[ORM\PreUpdate]
     public function preUpdate(PreUpdateEventArgs $eventArgs): void

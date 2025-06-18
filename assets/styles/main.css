@@ -61,6 +61,7 @@ a {color: black;}
 .file-item {text-align: center; width: 150px; padding: 0; display: flex;   flex-direction: column;
     align-items: normal;
     justify-content: space-between; }
+.file-item.invalid-item a {color: red}
 .file-item .copy-url-btn {visibility: hidden}
 .file-item:hover .copy-url-btn {visibility: visible}
 .file-item a {text-decoration: none}

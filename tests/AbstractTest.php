@@ -20,6 +20,7 @@ abstract class AbstractTest extends WebTestCase
     use ResetDatabase;
 
     protected KernelBrowser $client;
+    protected EntityManager $em;
 
     protected function createNewDb(): void
     {
@@ -37,6 +38,7 @@ abstract class AbstractTest extends WebTestCase
         $this->client->catchExceptions(false);
         $this->createNewDb();
         self::bootKernel();
+        $this->em = static::$kernel->getContainer()->get('doctrine')->getManager();
     }
 
     protected function assertResponseMimeTypeIs($expectedType): void
