@@ -11,15 +11,21 @@
             <ul>
             {% for item in items %}
                 {% set url = path('dl_anything_lang', {token: item.token, lang: item.lang, inline: 1}) %}
-                <li class="file-item">
-                    <a href="{{ url }}">
+                <li class="file-item {{ not item.isValid ? 'invalid-item' }}" data-token="{{ item.token }}">
+                    <a {% if item.isValid %}href="{{ url }}"{% endif %}>
                         <i class="far {{ item.faCssClass }} icon"></i>
                         <span class="title">{{ item.name }}</span>
                         <span class="lang">{{ item.lang ? '(' ~ item.lang|upper ~ ')' }}</span>
+                        {% if not item.isValid %}
+                            <p class="invalid-msg"><i class="fa fa-triangle-exclamation"></i> Fichier absent</p>
+                        {% endif %}
                     </a>
+                    {% if item.isValid %}
                     <div>
-                    {% include 'main/copyLinkAction.html.twig' with {url: url} only %}
+                        {% include 'main/copyLinkAction.html.twig' with {url: url} only %}
                     </div>
+                    {% endif %}
+
                 </li>
             {% endfor %}
             </ul>

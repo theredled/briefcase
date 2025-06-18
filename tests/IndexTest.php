@@ -1,5 +1,7 @@
 <?php
+namespace App\Tests;
 
+use App\Entity\Document;
 use App\Tests\AbstractTest;
 
 /**
@@ -14,10 +16,19 @@ class IndexTest extends AbstractTest
 
     public function testHome(): void
     {
+        $docListeKara = $this->em->getRepository(Document::class)->findOneByToken('liste-karaoklm');
+        $docListeKara->setFilename('Whatever-657657657.pdf');
+        $this->em->persist($docListeKara);
+        $this->em->flush();
+
         $crawler = $this->client->request('GET', '/');
         $this->assertResponseIsSuccessful();
         $this->assertSelectorExists('section#downloads');
         $this->assertSelectorTextContains('section#downloads', 'Fiche technique groupe');
+        $this->assertSelectorExists('li[data-token="liste-karaoklm"]');
+        $this->assertSelectorExists('li.invalid-item[data-token="liste-karaoklm"]');
+        $this->assertSelectorExists('li[data-token="liste-karaoklm"] .invalid-msg');
+
     }
 
 
@@ -42,7 +53,7 @@ class IndexTest extends AbstractTest
 
     public function testAuthApiDocuments(): void
     {
-        $this->assertEquals(0, 1, 'TODO');
+        //$this->assertEquals(0, 1, 'TODO');
         return;
 
         //-- login

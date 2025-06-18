@@ -64,7 +64,9 @@ class DocumentCrudController extends AbstractCrudController
             TextField::new('token', 'ID'),
             TextField::new('name', 'Titre'),
             ChoiceField::new('lang', 'Langue')->setChoices(['FR' => 'fr', 'EN' => 'en']),
-            TextField::new('file', 'Fichier')->setFormType(VichFileType::class)->hideOnIndex(),
+            TextField::new('file', 'Fichier')->setFormType(VichFileType::class)
+                ->setFormTypeOption('download_label', function (Document $doc){return $doc->getFilename();})
+                ->hideOnIndex(),
             BooleanField::new('isFolder', 'Dossier?') ,
             BooleanField::new('sensible', 'Sensible?'),
             DateTimeField::new('creationDate', 'Creé')->hideOnForm()->setFormat('dd/MM/yyyy'),
@@ -99,14 +101,14 @@ class DocumentCrudController extends AbstractCrudController
         return $entity;
     }
 
-    public function updateEntity(EntityManagerInterface $em, $entity): void
+    public function updateEntity(EntityManagerInterface $entityManager, $entityInstance): void
     {
-        parent::updateEntity($em, $entity);
+        parent::updateEntity($entityManager, $entityInstance);
     }
 
-    public function persistEntity(EntityManagerInterface $em, $entity): void
+    public function persistEntity(EntityManagerInterface $entityManager, $entityInstance): void
     {
-        parent::persistEntity($em, $entity);
+        parent::persistEntity($entityManager, $entityInstance);
     }
 
     protected function getDownloadUrl(Document $file): string
