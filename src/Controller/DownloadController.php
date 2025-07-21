@@ -88,7 +88,7 @@ class DownloadController extends AbstractController
 
 
         $response = new BinaryFileResponse($path, autoLastModified: false);
-        $contentDisposition = 'inline';//$request->get('inline') ? 'inline' : 'attachment';
+        $contentDisposition = $document->getSensible() ? 'attachment' : 'inline';//$request->get('inline') ? 'inline' : 'attachment';
         $response->setContentDisposition($contentDisposition, $document->getDownloadFilename());
         return $response;
     }
