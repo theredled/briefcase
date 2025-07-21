@@ -39,7 +39,9 @@ class DownloadController extends AbstractController
     #[Route('/dl/', name: 'dl_index')]
     public function dlIndex(Request $request, ManagerRegistry $doctrine): Response
     {
-        $fileEntities = $doctrine->getRepository(Document::class)->findNotSensible();
+        $fileEntities = $this->isGranted('ROLE_ADMIN')
+            ? $doctrine->getRepository(Document::class)->findAll()
+            : $doctrine->getRepository(Document::class)->findNotSensible();
 
         foreach ($fileEntities as $item) {
             $item->faCssClass = $this->downloadService->getFaCssClass($item);

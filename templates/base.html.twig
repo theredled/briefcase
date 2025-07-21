@@ -44,6 +44,12 @@
 
             <div id="header">
                 <h1>Fairy Tales in Yoghourt</h1>
+                {#
+                {% if is_granted('ROLE_ADMIN') %}
+                    <a class="user-status" href="{{ path('admin') }}">Connecté</a>
+                {% else %}
+                    <a class="user-status" href="{{ path('admin') }}">Se connecter</a>
+                {% endif %} #}
             </div>
 
             <div id="content">
