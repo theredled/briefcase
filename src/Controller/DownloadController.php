@@ -46,6 +46,7 @@ class DownloadController extends AbstractController
         foreach ($fileEntities as $item) {
             $item->faCssClass = $this->downloadService->getFaCssClass($item);
             $item->isValid = $this->downloadService->checkDocumentValidity($item);
+            $item->url = $this->downloadService->getDownloadUrl($item);
         }
 
         return $this->render('main/dlIndex.html.twig', [

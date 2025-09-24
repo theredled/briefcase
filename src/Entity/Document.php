@@ -43,6 +43,9 @@ class Document
     #[Groups(['product:read'])]
     public ?bool $isValid;
 
+    #[Groups(['product:read'])]
+    public ?string $url;
+
     public function getFileModificationDate(): ?\DateTimeImmutable
     {
         return $this->fileModificationDate;

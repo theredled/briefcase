@@ -22,13 +22,17 @@ use Symfony\Component\HttpKernel\Event\RequestEvent;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Symfony\Component\HttpKernel\KernelEvents;
+use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+use Symfony\Component\Routing\Router;
+use Symfony\Component\Routing\RouterInterface;
 
 class DownloadService implements EventSubscriberInterface
 {
     public function __construct(protected $zipsDir, protected $foldersDir, protected $filesDir,
                                 protected Filesystem $filesystem,
                                 protected ManagerRegistry $doctrine,
-                                protected UriSigner $uriSigner)
+                                protected UriSigner $uriSigner,
+                                protected RouterInterface $router)
     {
         Document::setDataDir($filesDir);
     }
@@ -184,5 +188,15 @@ class DownloadService implements EventSubscriberInterface
     public function setupAbsoluteDirs(RequestEvent $event) {
         Document::setDataDir($this->filesDir);
         Document::setFoldersDir($this->foldersDir);
+    }
+
+    public function getDownloadUrl(Document $file): string
+    {
+        $url = $this->router->generate('dl_anything', ['token' => $file->getToken()], UrlGeneratorInterface::ABSOLUTE_URL);
+
+        if ($file->getSensible())
+            $url = $this->uriSigner->sign($url);
+
+        return $url;
     }
 }

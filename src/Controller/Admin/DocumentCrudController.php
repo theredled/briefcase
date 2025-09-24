@@ -3,6 +3,7 @@
 namespace App\Controller\Admin;
 
 use App\Entity\Document;
+use App\Services\DownloadService;
 use CoopTilleuls\UrlSignerBundle\UrlSigner\UrlSignerInterface;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
@@ -34,6 +35,7 @@ class DocumentCrudController extends AbstractCrudController
 {
     public function __construct(
         protected UriSigner $uriSigner,
+        protected DownloadService $dlService,
     )
     {
     }
@@ -82,7 +84,7 @@ class DocumentCrudController extends AbstractCrudController
         $viewFile = Action::new('viewFile', 'Lien', 'fa fa-link')
             ->setTemplatePath('main/copyLinkAction.html.twig')
             ->linkToUrl(function (Document $file) {
-                return $this->getDownloadUrl($file);
+                return $this->dlService->getDownloadUrl($file);
             })
             ->displayAsLink();
 
@@ -111,7 +113,7 @@ class DocumentCrudController extends AbstractCrudController
         parent::persistEntity($entityManager, $entityInstance);
     }
 
-    protected function getDownloadUrl(Document $file): string
+    /*protected function getDownloadUrl(Document $file): string
     {
         $url = $this->generateUrl('dl_anything', ['token' => $file->getToken()], UrlGeneratorInterface::ABSOLUTE_URL);
 
@@ -119,6 +121,6 @@ class DocumentCrudController extends AbstractCrudController
             $url = $this->uriSigner->sign($url);
 
         return $url;
-    }
+    }*/
 
 }
