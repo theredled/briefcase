@@ -44,17 +44,19 @@
 
             <div id="header">
                 <h1>Fairy Tales in Yoghourt</h1>
-                {#
-                {% if is_granted('ROLE_ADMIN') %}
-                    <a class="user-status" href="{{ path('admin') }}">Connecté</a>
-                {% else %}
-                    <a class="user-status" href="{{ path('admin') }}">Se connecter</a>
-                {% endif %} #}
+
             </div>
 
             <div id="content">
-
-            {% block body %}{% endblock %}
+                <nav class="user-menu">
+                {% if is_granted('ROLE_ADMIN') %}
+                    <a href="{{ path('logout') }}">Se déconnecter</a>
+                    - <a href="{{ path('admin') }}">Admin</a>
+                {% else %}
+                    <a href="{{ path('login', {redirect: app.request.getRequestUri()}) }}">Se connecter</a>
+                {% endif %}
+                </nav>
+                {% block body %}{% endblock %}
             </div>
 
             <section id="footer">
