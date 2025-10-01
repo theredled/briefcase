@@ -50,10 +50,16 @@
             <div id="content">
                 <nav class="user-menu">
                 {% if is_granted('ROLE_ADMIN') %}
-                    <a href="{{ path('logout') }}">Se déconnecter</a>
-                    - <a href="{{ path('admin') }}">Admin</a>
+                    <a href="{{ path('admin') }}">
+                        <i class="fa fa-user-cog" title="Admin"></i>
+                    </a>
+                    <a href="{{ path('logout') }}">
+                        <i class="fa fa-sign-out" title="Se déconnecter"></i>
+                    </a>
                 {% else %}
-                    <a href="{{ path('login', {redirect: app.request.getRequestUri()}) }}">Se connecter</a>
+                    <a href="{{ path('login', {redirect: app.request.getRequestUri()}) }}">
+                        <i class="fa fa-sign-in" title="Se connecter"></i>
+                    </a>
                 {% endif %}
                 </nav>
                 {% block body %}{% endblock %}
