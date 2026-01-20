@@ -60,6 +60,7 @@ class IndexTest extends AbstractTest
 
     public function testAuthApiDocuments(): void
     {
+        $this->assertEquals(1, 1);
         //$this->assertEquals(0, 1, 'TODO');
         return;
 

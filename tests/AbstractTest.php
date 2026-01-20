@@ -25,10 +25,10 @@ abstract class AbstractTest extends WebTestCase
     protected function createNewDb(): void
     {
         $projectDir = self::$kernel->getProjectDir();
-        $prodDbPath = $projectDir . '/var/data.db';
+        $bootstrapDbPath = $projectDir . '/var/tests/bootstrap_data.db';
         $testDbPath = $projectDir . '/var/tests/data_test.db';
         unlink($testDbPath);
-        copy($prodDbPath, $testDbPath);
+        copy($bootstrapDbPath, $testDbPath);
     }
 
     protected function setUp(): void
