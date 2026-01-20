@@ -17,7 +17,7 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - name: Setup PHP with composer and custom process timeout
+    - name: Setup PHP version
       uses: shivammathur/setup-php@v2
       with:
         php-version: '8.4'
