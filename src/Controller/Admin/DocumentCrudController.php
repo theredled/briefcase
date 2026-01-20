@@ -95,7 +95,7 @@ class DocumentCrudController extends AbstractCrudController
             ;
     }
 
-    public function createEntity(string $entityFqcn)
+    public function createEntity(string $entityFqcn): object
     {
         $entity = new Document();
         $entity->setCreationDate(new \DateTimeImmutable());
