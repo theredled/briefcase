@@ -45,3 +45,10 @@ services:
     #
     #    autowire: true
     #    autoconfigure: false
+
+when@test:
+    parameters:
+        zips_dir: '%kernel.project_dir%/var/cache/zip'
+        folders_dir: '%web_dir%/var/tests/folders'
+        uploaded_files_dir: '%kernel.project_dir%/var/tests/documents'
+
