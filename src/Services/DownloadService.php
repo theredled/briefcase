@@ -37,11 +37,18 @@ class DownloadService implements EventSubscriberInterface
         Document::setDataDir($filesDir);
     }
 
+    public function findSimpleFilesFromFolder(Document $document)
+    {
+        $path = $document->getFolderAbsolutePath();
+        $filesInFolder = glob($path . '/*.*');
+        return $filesInFolder;
+    }
+
     public function buildZipFromFolder(Document $document)
     {
         $path = $document->getFolderAbsolutePath();
         $dirname = basename($path);
-        $filesInFolder = glob($path . '/*.*');
+        $filesInFolder = $this->findSimpleFilesFromFolder($document);
         $this->filesystem->mkdir($this->zipsDir);
         $zipPath = $this->zipsDir . '/' . $dirname . '.zip';
 
@@ -134,25 +141,32 @@ class DownloadService implements EventSubscriberInterface
         return 'fa-'.$this->getFontAwesomeIconName($fileEntity);
     }
 
-    public function getFontAwesomeIconName(Document $document): string
+    public function getFontAwesomeIconName(Document|string $pathOrDocument): string
     {
         $defaultClass = 'file-alt';
 
-        if ($document->isFolder())
-            return 'file-archive';
+        //-- path
+        if (is_string($pathOrDocument)) {
+            $absPath = $pathOrDocument;
+        }
+        else {
+            if ($pathOrDocument->isFolder())
+                return 'folder-open';
 
-        $absPath = $document->getAbsolutePath();
+            $absPath = $pathOrDocument->getAbsolutePath();
+        }
+
         if (!is_file($absPath))
             return $defaultClass;
-        $document->mimeType = mime_content_type($absPath);
+        $mimeType = mime_content_type($absPath);
 
-        if (!$document->mimeType)
+        if (!$mimeType)
             return $defaultClass;
 
-        if ($document->mimeType == 'application/pdf')
+        if ($mimeType == 'application/pdf')
             return 'file-pdf';
 
-        $mimePrefix = explode('/', $document->mimeType)[0];
+        $mimePrefix = explode('/', $mimeType)[0];
 
         $mimePrefixesToClasses = [
             'image' => 'file-image',

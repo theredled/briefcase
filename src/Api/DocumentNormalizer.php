@@ -6,6 +6,7 @@
  * Date: 01/06/2025
  * Time: 16:07
  */
+
 namespace App\Api;
 
 use App\Entity\Document;
@@ -20,10 +21,12 @@ use Symfony\Component\Serializer\SerializerInterface;
 class DocumentNormalizer implements NormalizerInterface, SerializerAwareInterface
 {
     public function __construct(
-        private NormalizerInterface $decorated,
+        private NormalizerInterface   $decorated,
         private UrlGeneratorInterface $router,
-        private DownloadService $downloadService,
-    ) {}
+        private DownloadService       $downloadService,
+    )
+    {
+    }
 
     public function supportsNormalization($data, ?string $format = null, array $context = []): bool
     {
@@ -33,8 +36,24 @@ class DocumentNormalizer implements NormalizerInterface, SerializerAwareInterfac
     public function normalize($object, ?string $format = null, array $context = []): array
     {
         $data = $this->decorated->normalize($object, $format, $context);
-        $data['url'] = $this->router->generate('dl_anything', ['token' => $object->getToken()], UrlGeneratorInterface::ABSOLUTE_URL);
+        $data['url'] = $this->router->generate('dl_anything', ['token' => $object->getToken()],
+            UrlGeneratorInterface::ABSOLUTE_URL);
         $data['fa_icon_name'] = $this->downloadService->getFontAwesomeIconName($object);
+        $data['is_valid'] = $this->downloadService->checkDocumentValidity($object);
+
+        if (in_array('document:detail', $context['groups'])) {
+            $data['included_simple_files'] = array_map(function ($path) {
+                return [
+                    'name' => basename($path),
+                    'extension' => pathinfo($path, PATHINFO_EXTENSION),
+                    'size' => $path ? filesize($path) : null,
+                    'mime_type' => $path ? mime_content_type($path) : null,
+                    'fa_icon_name' => $this->downloadService->getFontAwesomeIconName($path),
+                    'is_valid' => is_file($path)
+                ];
+            }, $this->downloadService->findSimpleFilesFromFolder($object));
+        }
+
         return $data;
     }
 

@@ -8,3 +8,4 @@ api_platform:
     formats:
         json:
             mime_types: [ 'application/json' ]
+    name_converter: 'Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter'

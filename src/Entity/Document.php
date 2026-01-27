@@ -17,6 +17,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\Serializer\Annotation\Groups;
+use Symfony\Component\Serializer\Annotation\SerializedName;
 use Vich\UploaderBundle\Mapping\Annotation as Vich;
 
 #[ORM\Entity(repositoryClass: DocumentRepository::class)]
@@ -27,23 +28,27 @@ use Vich\UploaderBundle\Mapping\Annotation as Vich;
     fields: ['token', 'lang']
 )]
 #[ApiResource(
-    operations: [new Get(), new GetCollection()],
-    normalizationContext: ['groups' => ['product:read']],
-    denormalizationContext: ['groups' => ['product:write']],
+    operations: [
+        new Get(normalizationContext: [
+            'groups' => ['document:list', 'document:detail'],
+        ]),
+        new GetCollection(normalizationContext: ['groups' => ['document:list']])
+    ],
+    denormalizationContext: ['groups' => ['document:write']],
     provider: DocumentProvider::class
 )]
 class Document
 {
-    #[Groups(['product:read'])]
+    #[Groups(['document:list'])]
     public ?string $mimeType;
 
-    #[Groups(['product:read'])]
+    #[Groups(['document:list'])]
     public ?string $faCssClass;
 
-    #[Groups(['product:read'])]
+    #[Groups(['document:list'])]
     public ?bool $isValid;
 
-    #[Groups(['product:read'])]
+    #[Groups(['document:list'])]
     public ?string $url;
 
     public function getFileModificationDate(): ?\DateTimeImmutable
@@ -170,6 +175,7 @@ class Document
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
+    #[Groups(['document:list'])]
     private ?int $id = null;
 
     /**#[ORM\Column(length: 255, nullable: true)]*/
@@ -186,26 +192,26 @@ class Document
     private ?\DateTimeImmutable $fileModificationDate = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['product:read'])]
+    #[Groups(['document:list'])]
     private ?string $token = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['product:read'])]
+    #[Groups(['document:list'])]
     private ?string $name = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['product:read'])]
+    #[Groups(['document:list'])]
     private ?string $lang = 'fr';
 
     #[ORM\OneToMany(mappedBy: 'File', targetEntity: Download::class)]
     private Collection $Downloads;
 
     #[ORM\Column(nullable: true)]
-    #[Groups(['product:read'])]
+    #[Groups(['document:list'])]
     private ?bool $isFolder = false;
 
     #[ORM\Column(nullable: true)]
-    #[Groups(['product:read'])]
+    #[Groups(['document:list'])]
     private ?bool $sensible = false;
 
     /**
@@ -215,6 +221,8 @@ class Document
     #[ORM\JoinTable(name: 'downloadable_file_downloadable_file')]
     #[ORM\JoinColumn(name: 'downloadable_file_target', referencedColumnName: 'id', onDelete: 'CASCADE')]
     #[ORM\InverseJoinColumn(name: 'downloadable_file_source', referencedColumnName: 'id', onDelete: 'CASCADE')]
+    #[Groups(['document:detail'])]
+    #[SerializedName('included_documents')]
     private Collection $IncludedFiles;
 
     /**
@@ -318,6 +326,11 @@ class Document
         }
 
         return $this;
+    }
+
+    public function getIsFolder(): ?bool
+    {
+        return $this->isFolder;
     }
 
     public function isFolder(): ?bool

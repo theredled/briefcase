@@ -46,6 +46,7 @@ services:
     #    autowire: true
     #    autoconfigure: false
 
+    'Symfony\Component\Serializer\NameConverter\CamelCaseToSnakeCaseNameConverter': ~
 when@test:
     parameters:
         zips_dir: '%kernel.project_dir%/var/cache/zip'

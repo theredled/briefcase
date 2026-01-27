@@ -27,7 +27,10 @@ class DocumentProvider implements ProviderInterface
         $isAuth = $this->userService->getCurrentUser();
 
         if ($operation instanceof \ApiPlatform\Metadata\GetCollection) {
-            return $this->repository->findBy($isAuth ? [] : ['sensible' => false]);
+            if ($isAuth)
+                return $this->repository->findAll();
+            else
+                return $this->repository->findNotSensible();
         }
 
         /** @var Document $doc */
