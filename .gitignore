@@ -12,6 +12,7 @@
 ###< symfony/framework-bundle ###
 /var/downloadable_files/
 /var/documents/
+/var/folders/
 /public/dl/
 
 ###> symfony/webpack-encore-bundle ###

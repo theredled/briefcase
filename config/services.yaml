@@ -7,7 +7,7 @@ parameters:
     web_dir: '%env(DOCUMENT_ROOT)%'
     project_dir: '%kernel.project_dir%'
     zips_dir: '%kernel.project_dir%/var/cache/zip'
-    folders_dir: '%web_dir%/dl'
+    folders_dir: '%kernel.project_dir%/var/folders'
     uploaded_files_dir: '%kernel.project_dir%/var/downloadable_files'
 
 services:
