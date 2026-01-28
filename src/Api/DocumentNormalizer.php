@@ -35,11 +35,14 @@ class DocumentNormalizer implements NormalizerInterface, SerializerAwareInterfac
 
     public function normalize($object, ?string $format = null, array $context = []): array
     {
+        /** @var Document $object */
         $data = $this->decorated->normalize($object, $format, $context);
         $data['url'] = $this->router->generate('dl_anything', ['token' => $object->getToken()],
             UrlGeneratorInterface::ABSOLUTE_URL);
         $data['fa_icon_name'] = $this->downloadService->getFontAwesomeIconName($object);
         $data['is_valid'] = $this->downloadService->checkDocumentValidity($object);
+        if (!$data['is_valid'])
+            $data['original_filename'] = $object->getFilename();
 
         if (in_array('document:detail', $context['groups'])) {
             $data['included_simple_files'] = array_map(function ($path) {

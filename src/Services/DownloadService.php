@@ -156,9 +156,7 @@ class DownloadService implements EventSubscriberInterface
             $absPath = $pathOrDocument->getAbsolutePath();
         }
 
-        if (!is_file($absPath))
-            return $defaultClass;
-        $mimeType = mime_content_type($absPath);
+        $mimeType = $this->findMimeType($absPath);
 
         if (!$mimeType)
             return $defaultClass;
@@ -179,6 +177,27 @@ class DownloadService implements EventSubscriberInterface
             return $mimePrefixesToClasses[$mimePrefix];
 
         return $defaultClass;
+    }
+
+    protected function findMimeType($fileName)
+    {
+        if (is_file($fileName))
+             return mime_content_type($fileName);;
+
+        $extToMimeTypes = [
+            'pdf' => 'application/pdf',
+            'png' => 'image/png',
+            'jpg' => 'image/jpg',
+            'txt' => 'text/plain',
+            'mp4' => 'video/mp4',
+            'avi' => 'video/avi',
+            'wav' => 'audio/wav',
+            'mp3' => 'audio/mpeg',
+            'flac' => 'audio/flac',
+        ];
+
+        $ext = pathinfo($fileName, PATHINFO_EXTENSION);
+        return $extToMimeTypes[$ext] ?? null;
     }
 
     public function uriSignerCheckRequest(Request $request): bool
