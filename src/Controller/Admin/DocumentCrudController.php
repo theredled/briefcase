@@ -86,7 +86,7 @@ class DocumentCrudController extends AbstractCrudController
             ->linkToUrl(function (Document $file) {
                 return $this->dlService->getDownloadUrl($file);
             })
-            ->displayAsLink();
+            ->renderAsLink();
 
         return $actions
             ->add(Crud::PAGE_INDEX, $viewFile)

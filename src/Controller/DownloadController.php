@@ -15,6 +15,7 @@ use App\Entity\Document;
 use App\Services\DownloadService;
 use Bg\MiscBundle\Helper\Url;
 use CoopTilleuls\UrlSignerBundle\UrlSigner\UrlSignerInterface;
+use DateTime;
 use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -121,11 +122,12 @@ class DownloadController extends AbstractController
     {
         $dl = new Download();
         $dl->setFile($fileEntity);
-        $dl->setDate(new \DateTime());
+        $dl->setDate(new DateTime());
         $dl->setIp($request->getClientIp());
         $dl->setInfos(json_encode($request->headers->all(), true));
         $dl->setFileName($fileEntity->getFilename());
-        $dl->setFileModificationDate($fileEntity->getFileModificationDate());
+        $dl->setFileModificationDate($fileEntity->getFileModificationDate()
+            ? DateTime::createFromImmutable($fileEntity->getFileModificationDate()) : null);
         $em = $this->doctrine->getManager();
         $em->persist($dl);
         $em->flush();
