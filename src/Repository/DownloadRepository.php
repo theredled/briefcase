@@ -14,7 +14,7 @@ use Doctrine\Persistence\ManagerRegistry;
  * @method Download[]    findAll()
  * @method Download[]    findBy(array $criteria, array $orderBy = null, $limit = null, $offset = null)
  */
-class DownloadRepository extends ServiceEntityRepository
+class DownloadRepository extends BaseRepository
 {
     public function __construct(ManagerRegistry $registry)
     {

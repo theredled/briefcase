@@ -64,6 +64,7 @@ class DocumentCrudController extends AbstractCrudController
     {
         return [
             TextField::new('token', 'ID'),
+            AssociationField::new('briefcase', 'Briefcase'),
             TextField::new('name', 'Titre'),
             ChoiceField::new('lang', 'Langue')->setChoices(['FR' => 'fr', 'EN' => 'en']),
             TextField::new('file', 'Fichier')->setFormType(VichFileType::class)
@@ -73,7 +74,7 @@ class DocumentCrudController extends AbstractCrudController
             BooleanField::new('sensible', 'Sensible?'),
             DateTimeField::new('creationDate', 'Creé')->hideOnForm()->setFormat('dd/MM/yyyy'),
             DateTimeField::new('fileModificationDate', 'Modifié')->hideOnForm()->setFormat('dd/MM/yyyy'),
-            AssociationField::new('IncludedFiles', 'Documents inclus')->setQueryBuilder(function(QueryBuilder $qb) {
+            AssociationField::new('includedFiles', 'Documents inclus')->setQueryBuilder(function(QueryBuilder $qb) {
                 $qb->andWhere('entity.isFolder = FALSE');
             }),
         ];
@@ -81,7 +82,7 @@ class DocumentCrudController extends AbstractCrudController
 
     public function configureActions(Actions $actions): Actions
     {
-        $viewFile = Action::new('viewFile', 'Lien', 'fa fa-link')
+        $copyLink = Action::new('copyLink', 'Lien', 'fa fa-link')
             ->setTemplatePath('main/copyLinkAction.html.twig')
             ->linkToUrl(function (Document $file) {
                 return $this->dlService->getDownloadUrl($file);
@@ -89,9 +90,9 @@ class DocumentCrudController extends AbstractCrudController
             ->renderAsLink();
 
         return $actions
-            ->add(Crud::PAGE_INDEX, $viewFile)
-            ->add(Crud::PAGE_EDIT, $viewFile)
-            ->add(Crud::PAGE_DETAIL, $viewFile)
+            ->add(Crud::PAGE_INDEX, $copyLink)
+            ->add(Crud::PAGE_EDIT, $copyLink)
+            ->add(Crud::PAGE_DETAIL, $copyLink)
             ;
     }
 

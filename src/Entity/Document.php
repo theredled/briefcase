@@ -32,23 +32,23 @@ use Vich\UploaderBundle\Mapping\Attribute as Vich;
         new Get(normalizationContext: [
             'groups' => ['document:list', 'document:detail'],
         ]),
-        new GetCollection(normalizationContext: ['groups' => ['document:list']])
+        //new GetCollection(normalizationContext: ['groups' => ['document:list']])
     ],
     denormalizationContext: ['groups' => ['document:write']],
     provider: DocumentProvider::class
 )]
-class Document
+class Document implements BelongsToBriefcase
 {
-    #[Groups(['document:list'])]
+    #[Groups(['bc:detail', 'document:list'])]
     public ?string $mimeType;
 
-    #[Groups(['document:list'])]
+    #[Groups(['bc:detail', 'document:list'])]
     public ?string $faCssClass;
 
-    #[Groups(['document:list'])]
+    #[Groups(['bc:detail', 'document:list'])]
     public ?bool $isValid;
 
-    #[Groups(['document:list'])]
+    #[Groups(['bc:detail', 'document:list'])]
     public ?string $url;
 
     public function getFileModificationDate(): ?\DateTimeImmutable
@@ -175,7 +175,7 @@ class Document
     #[ORM\Id]
     #[ORM\GeneratedValue]
     #[ORM\Column]
-    #[Groups(['document:list'])]
+    #[Groups(['bc:detail', 'document:list'])]
     private ?int $id = null;
 
     /**#[ORM\Column(length: 255, nullable: true)]*/
@@ -192,57 +192,58 @@ class Document
     private ?\DateTimeImmutable $fileModificationDate = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['document:list'])]
+    #[Groups(['bc:detail', 'document:list'])]
     private ?string $token = null;
 
     #[ORM\Column(length: 255)]
-    #[Groups(['document:list'])]
+    #[Groups(['bc:detail', 'document:list'])]
     private ?string $name = null;
 
     #[ORM\Column(length: 255, nullable: true)]
-    #[Groups(['document:list'])]
+    #[Groups(['bc:detail', 'document:list'])]
     private ?string $lang = 'fr';
 
-    #[ORM\OneToMany(mappedBy: 'File', targetEntity: Download::class)]
-    private Collection $Downloads;
+    #[ORM\OneToMany(mappedBy: 'document', targetEntity: Download::class)]
+    private Collection $downloads;
 
     #[ORM\Column(nullable: true)]
-    #[Groups(['document:list'])]
+    #[Groups(['bc:detail', 'document:list'])]
     private ?bool $isFolder = false;
 
     #[ORM\Column(nullable: true)]
-    #[Groups(['document:list'])]
+    #[Groups(['bc:detail', 'document:list'])]
     private ?bool $sensible = false;
 
     /**
      * @var Collection<int, self>
      */
-    #[ORM\ManyToMany(targetEntity: self::class, inversedBy: 'DocumentContainers')]
+    #[ORM\ManyToMany(targetEntity: self::class, inversedBy: 'documentContainers')]
     #[ORM\JoinTable(name: 'downloadable_file_downloadable_file')]
     #[ORM\JoinColumn(name: 'downloadable_file_target', referencedColumnName: 'id', onDelete: 'CASCADE')]
     #[ORM\InverseJoinColumn(name: 'downloadable_file_source', referencedColumnName: 'id', onDelete: 'CASCADE')]
     #[Groups(['document:detail'])]
     #[SerializedName('included_documents')]
-    private Collection $IncludedFiles;
+    private Collection $includedFiles;
 
     /**
      * @var Collection<int, self>
      */
-    #[ORM\ManyToMany(targetEntity: self::class, mappedBy: 'IncludedFiles')]
-    private Collection $DocumentContainers;
+    #[ORM\ManyToMany(targetEntity: self::class, mappedBy: 'includedFiles')]
+    private Collection $documentContainers;
+
+    #[ORM\ManyToOne(inversedBy: 'documents')]
+    private ?Briefcase $briefcase = null;
 
     public function __toString()
     {
         return $this->getName();
     }
 
-
-
     public function __construct()
     {
-        $this->Downloads = new ArrayCollection();
-        $this->IncludedFiles = new ArrayCollection();
-        $this->DocumentContainers = new ArrayCollection();
+        $this->downloads = new ArrayCollection();
+        $this->includedFiles = new ArrayCollection();
+        $this->documentContainers = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -303,14 +304,14 @@ class Document
      */
     public function getDownloads(): Collection
     {
-        return $this->Downloads;
+        return $this->downloads;
     }
 
     public function addDownload(Download $download): self
     {
-        if (!$this->Downloads->contains($download)) {
-            $this->Downloads->add($download);
-            $download->setFile($this);
+        if (!$this->downloads->contains($download)) {
+            $this->downloads->add($download);
+            $download->setDocument($this);
         }
 
         return $this;
@@ -318,10 +319,10 @@ class Document
 
     public function removeDownload(Download $download): self
     {
-        if ($this->Downloads->removeElement($download)) {
+        if ($this->downloads->removeElement($download)) {
             // set the owning side to null (unless already changed)
-            if ($download->getFile() === $this) {
-                $download->setFile(null);
+            if ($download->getDocument() === $this) {
+                $download->setDocument(null);
             }
         }
 
@@ -377,13 +378,13 @@ class Document
      */
     public function getIncludedFiles(): Collection
     {
-        return $this->IncludedFiles;
+        return $this->includedFiles;
     }
 
     public function addIncludedFile(self $includedFile): static
     {
-        if (!$this->IncludedFiles->contains($includedFile)) {
-            $this->IncludedFiles->add($includedFile);
+        if (!$this->includedFiles->contains($includedFile)) {
+            $this->includedFiles->add($includedFile);
         }
 
         return $this;
@@ -391,7 +392,7 @@ class Document
 
     public function removeIncludedFile(self $includedFile): static
     {
-        $this->IncludedFiles->removeElement($includedFile);
+        $this->includedFiles->removeElement($includedFile);
 
         return $this;
     }
@@ -401,13 +402,13 @@ class Document
      */
     public function getDocumentContainers(): Collection
     {
-        return $this->DocumentContainers;
+        return $this->documentContainers;
     }
 
     public function addDocumentContainer(self $downloadbleContainer): static
     {
-        if (!$this->DocumentContainers->contains($downloadbleContainer)) {
-            $this->DocumentContainers->add($downloadbleContainer);
+        if (!$this->documentContainers->contains($downloadbleContainer)) {
+            $this->documentContainers->add($downloadbleContainer);
             $downloadbleContainer->addIncludedFile($this);
         }
 
@@ -416,7 +417,7 @@ class Document
 
     public function removeDocumentContainer(self $downloadbleContainer): static
     {
-        if ($this->DocumentContainers->removeElement($downloadbleContainer)) {
+        if ($this->documentContainers->removeElement($downloadbleContainer)) {
             $downloadbleContainer->removeIncludedFile($this);
         }
 
@@ -440,4 +441,17 @@ class Document
             $this->fileModificationDate = new \DateTimeImmutable();
         }
     }
+
+    public function getBriefcase(): ?Briefcase
+    {
+        return $this->briefcase;
+    }
+
+    public function setBriefcase(?Briefcase $briefcase): static
+    {
+        $this->briefcase = $briefcase;
+
+        return $this;
+    }
+
 }

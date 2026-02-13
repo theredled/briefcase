@@ -26,11 +26,10 @@ class DocumentProvider implements ProviderInterface
     {
         $isAuth = $this->userService->getCurrentUser();
 
+        $bcId = $uriVariables['bc'] ?? null;
+
         if ($operation instanceof \ApiPlatform\Metadata\GetCollection) {
-            if ($isAuth)
-                return $this->repository->findAll();
-            else
-                return $this->repository->findNotSensible();
+            return $this->repository->findFromBriefcase($bcId);
         }
 
         /** @var Document $doc */

@@ -9,12 +9,17 @@ parameters:
     zips_dir: '%kernel.project_dir%/var/cache/zip'
     folders_dir: '%kernel.project_dir%/var/folders'
     uploaded_files_dir: '%kernel.project_dir%/var/downloadable_files'
+    default_briefcase_token: 'bg'
 
 services:
     # default configuration for services in *this* file
     _defaults:
         autowire: true      # Automatically injects dependencies in your services.
         autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+
+    _instanceof:
+        App\DependencyInjection\HasAuthChecker:
+            tags: ['app.needs_auth_checker']
 
     # makes classes in src/ available to be used as services
     # this creates a service per class whose id is the fully-qualified class name

@@ -32,8 +32,8 @@ class Download
     #[ORM\Column(length: 255, nullable: true)]
     private ?string $ip = null;
 
-    #[ORM\ManyToOne(inversedBy: 'Downloads')]
-    private ?Document $File = null;
+    #[ORM\ManyToOne(inversedBy: 'downloads')]
+    private ?Document $document = null;
 
     public function getId(): ?int
     {
@@ -88,14 +88,14 @@ class Download
         return $this;
     }
 
-    public function getFile(): ?Document
+    public function getDocument(): ?Document
     {
-        return $this->File;
+        return $this->document;
     }
 
-    public function setFile(?Document $File): self
+    public function setDocument(?Document $document): self
     {
-        $this->File = $File;
+        $this->document = $document;
 
         return $this;
     }

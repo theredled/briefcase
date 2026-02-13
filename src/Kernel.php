@@ -2,7 +2,9 @@
 
 namespace App;
 
+use App\DependencyInjection\AuthCheckerInjectionCompilerPass;
 use Symfony\Bundle\FrameworkBundle\Kernel\MicroKernelTrait;
+use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Kernel as BaseKernel;
 
 class Kernel extends BaseKernel
@@ -18,6 +20,11 @@ class Kernel extends BaseKernel
     public function getVarDir()
     {
         return $this->getProjectDir().'/var';
+    }
+
+    public function build(ContainerBuilder $container): void
+    {
+        $container->addCompilerPass(new AuthCheckerInjectionCompilerPass());
     }
 
 

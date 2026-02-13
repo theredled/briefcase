@@ -20,12 +20,11 @@ class SecurityController extends AbstractController
             // parameters usually defined in Symfony login forms
             'error' => $error,
             'last_username' => $lastUsername,
-            'target_path' => $request->get('redirect')
+            'target_path' => $request->query->get('redirect')
         ]);
     }
 
     /**
-     * @Route("/logout")
      * @throws \RuntimeException
      */
     #[Route("/logout", name: "logout")]

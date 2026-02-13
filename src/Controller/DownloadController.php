@@ -10,6 +10,7 @@
 namespace App\Controller;
 
 
+use App\Entity\Briefcase;
 use App\Entity\Download;
 use App\Entity\Document;
 use App\Services\DownloadService;
@@ -30,7 +31,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Core\Signature\Exception\InvalidSignatureException;
 use \ZipArchive;
 
-class DownloadController extends AbstractController
+class DownloadController extends BaseController
 {
     public function __construct(protected DownloadService $downloadService, protected ManagerRegistry $doctrine)
     {
@@ -40,11 +41,19 @@ class DownloadController extends AbstractController
     #[Route('/dl/', name: 'dl_index')]
     public function dlIndex(Request $request, ManagerRegistry $doctrine): Response
     {
-        $fileEntities = $this->isGranted('ROLE_ADMIN')
-            ? $doctrine->getRepository(Document::class)->findAll()
-            : $doctrine->getRepository(Document::class)->findNotSensible();
+        $bcToken = $this->getParameter('default_briefcase_token');
+        return $this->redirectToRoute('viewBriefcase', ['token' => $bcToken]);
+    }
 
-        foreach ($fileEntities as $item) {
+    #[Route('/b/{token}', name: 'viewBriefcase')]
+    public function viewBriefcase(Request $request, ManagerRegistry $doctrine, $token): Response
+    {
+        $briefcase = $doctrine->getRepository(Briefcase::class)->findOneBy(['token' => $token]);
+        $this->denyAccessUnlessExists($briefcase);
+
+        $documents = $doctrine->getRepository(Document::class)->findFromBriefcase($briefcase);
+
+        foreach ($documents as $item) {
             $item->faCssClass = $this->downloadService->getFaCssClass($item);
             $item->isValid = $this->downloadService->checkDocumentValidity($item);
             $item->url = $this->downloadService->getDownloadUrl($item);
@@ -52,7 +61,7 @@ class DownloadController extends AbstractController
 
         return $this->render('main/dlIndex.html.twig', [
             'lang' => $request->getPreferredLanguage(['fr', 'en']),
-            'items' => $fileEntities,
+            'items' => $documents,
         ]);
     }
 
@@ -67,7 +76,7 @@ class DownloadController extends AbstractController
 
         $document = $this->downloadService->findEntityOrFail($token, $lang, $request);
 
-        if ($request->get('dl') or $request->get('inline')) {
+        if ($request->query->get('dl') or $request->query->get('inline')) {
 
             $this->registerDownload($document, $request);
 
@@ -121,7 +130,7 @@ class DownloadController extends AbstractController
     protected function registerDownload(Document $fileEntity, Request $request): void
     {
         $dl = new Download();
-        $dl->setFile($fileEntity);
+        $dl->setDocument($fileEntity);
         $dl->setDate(new DateTime());
         $dl->setIp($request->getClientIp());
         $dl->setInfos(json_encode($request->headers->all(), true));
@@ -136,7 +145,7 @@ class DownloadController extends AbstractController
 
     protected function getLang(Request $request, $available = ['fr', 'en'])
     {
-        $lang = $request->get('lang', $request->getPreferredLanguage($available));
+        $lang = $request->query->get('lang', $request->getPreferredLanguage($available));
         if (in_array($lang, $available))
             return $lang;
         else

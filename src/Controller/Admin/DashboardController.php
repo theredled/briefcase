@@ -2,6 +2,7 @@
 
 namespace App\Controller\Admin;
 
+use App\Entity\Briefcase;
 use App\Entity\Download;
 use App\Entity\Document;
 use App\Entity\Video;
@@ -65,6 +66,7 @@ class DashboardController extends AbstractDashboardController
     public function configureMenuItems(): iterable
     {
         yield MenuItem::linkToDashboard('Dashboard', 'fa fa-home');
+        yield MenuItem::linkToCrud('Briefcases', 'fas fa-suitcase', Briefcase::class);
         yield MenuItem::linkToCrud('Documents', 'fas fa-file', Document::class);
         yield MenuItem::linkToCrud('Téléchargements', 'fas fa-download', Download::class);
     }

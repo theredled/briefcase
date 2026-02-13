@@ -26,7 +26,7 @@ class DownloadCrudController extends AbstractCrudController
         return [
             //IdField::new('id'),
             DateTimeField::new('date')->setFormat('dd/MM/yyyy HH:mm'),
-            AssociationField::new('File', 'Document'),
+            AssociationField::new('file', 'Document'),
             TextField::new('fileName', 'Fichier original'),
             DateTimeField::new('fileModificationDate', 'Date fichier')->setFormat('dd/MM/yyyy'),
             TextField::new('ip'),
