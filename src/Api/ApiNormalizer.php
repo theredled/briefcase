@@ -41,10 +41,10 @@ class ApiNormalizer implements NormalizerInterface, SerializerAwareInterface
         $data = $this->decorated->normalize($object, $format, $context);
 
         if ($object instanceof Briefcase) {
-            /*$documents = $this->documentRepository->findFromBriefcase($object);
+            $documents = $this->documentRepository->findFromBriefcase($object);
             $data['documents'] = array_map(function (Document $doc) use ($format, $context) {
                 return $this->normalize($doc, $format, $context);
-            }, $documents);*/
+            }, $documents);
         }
         else if ($object instanceof Document) {
             /** @var Document $object */

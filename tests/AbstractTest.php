@@ -22,6 +22,11 @@ abstract class AbstractTest extends WebTestCase
     protected KernelBrowser $client;
     protected EntityManager $em;
 
+    protected function getParameter($name)
+    {
+        return static::$kernel->getContainer()->getParameter($name);
+    }
+
     protected function createNewDb(): void
     {
         $projectDir = self::$kernel->getProjectDir();

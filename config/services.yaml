@@ -10,6 +10,7 @@ parameters:
     folders_dir: '%kernel.project_dir%/var/folders'
     uploaded_files_dir: '%kernel.project_dir%/var/downloadable_files'
     default_briefcase_token: 'bg'
+    default_briefcase_id: 1
 
 services:
     # default configuration for services in *this* file

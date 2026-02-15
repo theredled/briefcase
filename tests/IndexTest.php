@@ -22,6 +22,7 @@ class IndexTest extends AbstractTest
         $this->em->persist($docListeKara);
         $this->em->flush();
 
+        $this->client->followRedirects(true);
         $crawler = $this->client->request('GET', '/');
         $this->assertResponseIsSuccessful();
         $this->assertSelectorExists('section#downloads');
@@ -39,17 +40,19 @@ class IndexTest extends AbstractTest
     }
 
 
-    public function testApiDocuments(): void
+    public function testApiBriefcase(): void
     {
-        $crawler = $this->client->request('GET', '/api/documents');
+
+        $crawler = $this->client->request('GET', '/api/briefcases/'.$this->getParameter('default_briefcase_id'));
         $this->assertResponseIsSuccessful();
         $this->assertResponseMimeTypeIs('application/json');
         $json = json_decode($this->client->getResponse()->getContent(), true);
+        $documentsList = $json['documents'];
 
         $sensibleCount = 0;
-        $allFilesCount = count($json);
+        $allFilesCount = count($documentsList);
 
-        foreach ($json as $file) {
+        foreach ($documentsList as $file) {
             if ($file['sensible'])
                 $sensibleCount++;
         }
@@ -58,7 +61,7 @@ class IndexTest extends AbstractTest
         $this->assertEquals(0, $sensibleCount, 'Sensible');
     }
 
-    public function testAuthApiDocuments(): void
+    public function testAuthApiBriefcase(): void
     {
         $this->assertEquals(1, 1);
         //$this->assertEquals(0, 1, 'TODO');
@@ -67,7 +70,7 @@ class IndexTest extends AbstractTest
         //-- login
 
         //-- req with token
-        $crawler = $this->client->request('GET', '/api/documents');
+        $crawler = $this->client->request('GET', '/api/briefcases/'.$this->getParameter('default_briefcase_id'));
         $this->assertResponseIsSuccessful();
         $this->assertResponseMimeTypeIs('application/json');
         $json = json_decode($this->client->getResponse()->getContent(), true);

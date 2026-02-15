@@ -45,7 +45,7 @@ class Briefcase
      * @var Collection<int, Document>
      */
     #[ORM\OneToMany(targetEntity: Document::class, mappedBy: 'briefcase')]
-    #[Groups(['bc:detail'])]
+    //#[Groups(['bc:detail'])]
     private Collection $documents;
 
     #[ORM\Column(length: 255)]
