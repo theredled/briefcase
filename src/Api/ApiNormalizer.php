@@ -24,7 +24,6 @@ class ApiNormalizer implements NormalizerInterface, SerializerAwareInterface
 {
     public function __construct(
         private NormalizerInterface   $decorated,
-        private UrlGeneratorInterface $router,
         private DownloadService       $downloadService,
         private DocumentRepository    $documentRepository
     )
@@ -36,27 +35,27 @@ class ApiNormalizer implements NormalizerInterface, SerializerAwareInterface
         return $this->decorated->supportsNormalization($data, $format, $context);
     }
 
-    public function normalize($object, ?string $format = null, array $context = []): array
+    public function normalize($data, ?string $format = null, array $context = []): array
     {
-        $data = $this->decorated->normalize($object, $format, $context);
+        $object = $data;
+        $normData = $this->decorated->normalize($object, $format, $context);
 
         if ($object instanceof Briefcase) {
-            $documents = $this->documentRepository->findFromBriefcase($object);
-            $data['documents'] = array_map(function (Document $doc) use ($format, $context) {
+            $documents = $this->documentRepository->findFromBriefcase($data);
+            $normData['documents'] = array_map(function (Document $doc) use ($format, $context) {
                 return $this->normalize($doc, $format, $context);
             }, $documents);
         }
         else if ($object instanceof Document) {
             /** @var Document $object */
-            $data['url'] = $this->router->generate('dl_anything', ['token' => $object->getToken()],
-                UrlGeneratorInterface::ABSOLUTE_URL);
-            $data['fa_icon_name'] = $this->downloadService->getFontAwesomeIconName($object);
-            $data['is_valid'] = $this->downloadService->checkDocumentValidity($object);
-            if (!$data['is_valid'])
-                $data['original_filename'] = $object->getFilename();
+            $normData['url'] = $this->downloadService->getDownloadUrl($object);
+            $normData['fa_icon_name'] = $this->downloadService->getFontAwesomeIconName($object);
+            $normData['is_valid'] = $this->downloadService->checkDocumentValidity($object);
+            if (!$normData['is_valid'])
+                $normData['original_filename'] = $object->getFilename();
 
             if (in_array('document:detail', $context['groups'])) {
-                $data['included_simple_files'] = array_map(function ($path) {
+                $normData['included_simple_files'] = array_map(function ($path) {
                     return [
                         'name' => basename($path),
                         'extension' => pathinfo($path, PATHINFO_EXTENSION),
@@ -69,7 +68,7 @@ class ApiNormalizer implements NormalizerInterface, SerializerAwareInterface
             }
         }
 
-        return $data;
+        return $normData;
     }
 
     public function getSupportedTypes(?string $format): array
