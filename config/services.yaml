@@ -11,6 +11,7 @@ parameters:
     uploaded_files_dir: '%kernel.project_dir%/var/downloadable_files'
     default_briefcase_token: 'bg'
     default_briefcase_id: 1
+    download_url_prefix: '%env(DOWNLOAD_URL_PREFIX)%'
 
 services:
     # default configuration for services in *this* file

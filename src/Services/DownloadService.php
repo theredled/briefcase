@@ -13,6 +13,7 @@ namespace App\Services;
 use App\Entity\Document;
 use Bg\MiscBundle\Helper\Url;
 use Doctrine\Persistence\ManagerRegistry;
+use Symfony\Component\DependencyInjection\Attribute\Autowire;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\Request;
@@ -29,6 +30,7 @@ use Symfony\Component\Routing\RouterInterface;
 class DownloadService implements EventSubscriberInterface
 {
     public function __construct(protected $zipsDir, protected $foldersDir, protected $filesDir,
+                                #[Autowire('%download_url_prefix%')] protected string $downloadUrlPrefix,
                                 protected Filesystem $filesystem,
                                 protected ManagerRegistry $doctrine,
                                 protected UriSigner $uriSigner,
@@ -225,7 +227,8 @@ class DownloadService implements EventSubscriberInterface
 
     public function getDownloadUrl(Document $file): string
     {
-        $url = $this->router->generate('dl_anything', ['token' => $file->getToken()], UrlGeneratorInterface::ABSOLUTE_URL);
+        $urlPath = $this->router->generate('dl_anything', ['token' => $file->getToken()], UrlGeneratorInterface::ABSOLUTE_PATH);
+        $url = $this->downloadUrlPrefix . $urlPath;
 
         if ($file->getSensible())
             $url = $this->uriSigner->sign($url);
