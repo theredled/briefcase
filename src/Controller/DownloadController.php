@@ -15,11 +15,13 @@ use App\Entity\Download;
 use App\Services\DownloadService;
 use Bg\MiscBundle\Helper\Url;
 use Doctrine\Persistence\ManagerRegistry;
+use Symfony\Component\DependencyInjection\Attribute\When;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Twig\Environment;
 
 class DownloadController extends BaseController
 {
@@ -27,7 +29,7 @@ class DownloadController extends BaseController
     {
     }
 
-    #[Route('/', name: 'home')]
+    #[Route('/', name: 'home', env: ['dev', 'test'])]
     #[Route('/dl/', name: 'dl_index')]
     public function dlIndex(Request $request, ManagerRegistry $doctrine): Response
     {
@@ -36,7 +38,7 @@ class DownloadController extends BaseController
         return $this->redirectToRoute('viewBriefcase', ['token' => $bcToken]);
     }
 
-    #[Route('/b/{token}', name: 'viewBriefcase')]
+    #[Route('/b/{token}', name: 'viewBriefcase', env: ['dev', 'test'])]
     public function viewBriefcase(Request $request, ManagerRegistry $doctrine, $token): Response
     {
         $briefcase = $doctrine->getRepository(Briefcase::class)->findOneBy(['token' => $token]);
