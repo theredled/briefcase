@@ -3,20 +3,12 @@
 namespace App\Tests;
 
 use App\Entity\Document;
-use App\Kernel;
 use Doctrine\ORM\EntityManager;
-use Symfony\Bundle\FrameworkBundle\KernelBrowser;
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\UriSigner;
 use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
-use Symfony\Component\HttpKernel\KernelInterface;
-use Symfony\Component\Security\Http\AccessToken\Oidc\Exception\InvalidSignatureException;
-use Zenstruck\Foundry\Test\Factories;
-use Zenstruck\Foundry\Test\ResetDatabase;
 
 class DownloadTest extends AbstractTest
 {
-
     public function testRegularPdf()
     {
         $crawler = $this->client->request('GET', '/d/tech-rider-solo');
@@ -24,7 +16,6 @@ class DownloadTest extends AbstractTest
         $crawler = $this->client->request('GET', $newUrl);
         $this->assertResponseMimeTypeIs('application/pdf');
     }
-
 
     public function testFolderWithOnlyDirectFiles(): void
     {
@@ -52,12 +43,11 @@ class DownloadTest extends AbstractTest
         try {
             $crawler = $this->client->request('GET', $uri);
             $this->fail();
-        }
-        catch (AccessDeniedHttpException $e) {
+        } catch (AccessDeniedHttpException $e) {
             $this->assertTrue(true);
         }
         $absoluteUri = $this->client->getRequest()->getUri();
-        //$this->assertResponseStatusCodeSame(403);
+        // $this->assertResponseStatusCodeSame(403);
         /** @var UriSigner $uriSigner */
         $uriSigner = static::getContainer()->get(UriSigner::class);
         $signedUri = $uriSigner->sign($absoluteUri);
@@ -90,8 +80,6 @@ class DownloadTest extends AbstractTest
         $this->assertResponseMimeTypeIs('application/zip');
     }
 
-
-
     protected function assertPreviewWorks($message = '')
     {
         $this->assertResponseIsSuccessful($message);
@@ -99,6 +87,7 @@ class DownloadTest extends AbstractTest
         $this->assertSelectorExists('meta[http-equiv="Refresh"]', $message);
         $attr = $this->client->getCrawler()->filter('meta[http-equiv="Refresh"]')->attr('content');
         $url = preg_replace("#^(.*)url='(.*)'$#", '$2', $attr);
+
         return $url;
     }
 }
