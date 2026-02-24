@@ -15,18 +15,36 @@ use App\Entity\Download;
 use App\Services\DownloadService;
 use Bg\MiscBundle\Helper\Url;
 use Doctrine\Persistence\ManagerRegistry;
-use Symfony\Component\DependencyInjection\Attribute\When;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\File\File;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-use Twig\Environment;
+use Vich\UploaderBundle\Form\Type\VichFileType;
 
 class DownloadController extends BaseController
 {
     public function __construct(protected DownloadService $downloadService, protected ManagerRegistry $doctrine)
     {
+    }
+
+    #[Route('/testForm/', name: 'testForm', env: ['dev', 'test'])]
+    public function testForm(Request $request, ManagerRegistry $doctrine): Response
+    {
+        $doc = $doctrine->getRepository(Document::class)->find(30);
+
+
+        $fb = $this->createFormBuilder($doc)
+            ->add('file', VichFileType::class, [
+                'download_uri' => 'foo',
+                //'download_label' => fn($doc) => 'bar'
+            ]);
+
+        return $this->render('testForm.html.twig', [
+            'form' => $fb->getForm()->createView(),
+        ]);
     }
 
     #[Route('/', name: 'home', env: ['dev', 'test'])]

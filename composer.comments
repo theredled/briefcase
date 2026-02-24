@@ -1,0 +1,10 @@
+        "easycorp/easyadmin-bundle": "dev-bugfix-vichuploader-translations-7415",
+        "vich/uploader-bundle": "dev-bugfix-translations-1573"
+                {
+                    "type": "vcs",
+                    "url": "https://github.com/theredled/VichUploaderBundle"
+                },
+                {
+                    "type": "vcs",
+                    "url": "https://github.com/theredled/EasyAdminBundle"
+                }
