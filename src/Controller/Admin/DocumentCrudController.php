@@ -4,40 +4,29 @@ namespace App\Controller\Admin;
 
 use App\Entity\Document;
 use App\Services\DownloadService;
-use CoopTilleuls\UrlSignerBundle\UrlSigner\UrlSignerInterface;
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\QueryBuilder;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
-use EasyCorp\Bundle\EasyAdminBundle\Config\Assets;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Crud;
-use EasyCorp\Bundle\EasyAdminBundle\Context\AdminContext;
 use EasyCorp\Bundle\EasyAdminBundle\Controller\AbstractCrudController;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\ChoiceField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\CollectionField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\DateTimeField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\IdField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\ImageField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
-use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\UriSigner;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
-use Symfony\Component\Validator\Constraints\File;
 use Vich\UploaderBundle\Form\Type\VichFileType;
-use Vich\UploaderBundle\Form\Type\VichImageType;
 
 class DocumentCrudController extends AbstractCrudController
 {
     public function __construct(
         protected UriSigner $uriSigner,
         protected DownloadService $dlService,
-    )
-    {
+    ) {
     }
 
     public static function getEntityFqcn(): string
@@ -50,34 +39,60 @@ class DocumentCrudController extends AbstractCrudController
         return $crud->setDefaultSort(['sensible' => 'DESC', 'token' => 'ASC'])
             ->setEntityLabelInSingular('Document')
             ->setEntityLabelInPlural('Documents')
-           ;
+        ;
     }
 
     #[Route('/admin_view_file/{filename}', name: 'admin_view_file')]
     public function viewFileAction($filename)
     {
         $path = Document::getUploadDir().'/'.$filename;
+
         return new BinaryFileResponse($path);
     }
 
     public function configureFields(string $pageName): iterable
     {
-        return [
-            TextField::new('token', 'ID'),
+        $fields = [
             AssociationField::new('briefcase', 'Briefcase'),
+            TextField::new('token', 'ID'),
             TextField::new('name', 'Titre'),
             ChoiceField::new('lang', 'Langue')->setChoices(['FR' => 'fr', 'EN' => 'en']),
             TextField::new('file', 'Fichier')->setFormType(VichFileType::class)
-                ->setFormTypeOption('download_label', function (Document $doc){return $doc->getFilename();})
+                //->setFormTypeOption('translation_domain', 'Blabla')
+                ->setFormTypeOption('download_label', function (Document $doc) {return $doc->getFilename(); })
+                //->setFormTypeOption('download_label', function (Document $doc) {return 'test';})
                 ->hideOnIndex(),
-            BooleanField::new('isFolder', 'Dossier?') ,
+            BooleanField::new('isFolder', 'Dossier?'),
             BooleanField::new('sensible', 'Sensible?'),
             DateTimeField::new('creationDate', 'Creé')->hideOnForm()->setFormat('dd/MM/yyyy'),
             DateTimeField::new('fileModificationDate', 'Modifié')->hideOnForm()->setFormat('dd/MM/yyyy'),
-            AssociationField::new('includedFiles', 'Documents inclus')->setQueryBuilder(function(QueryBuilder $qb) {
+            AssociationField::new('includedFiles', 'Documents inclus')->setQueryBuilder(function (QueryBuilder $qb) {
                 $qb->andWhere('entity.isFolder = FALSE');
             }),
         ];
+
+        if (Crud::PAGE_INDEX === $pageName) {
+            $fields = $this->reorderFields($fields, ['token', 'name', 'lang', 'isFolder', 'sensible', 'creationDate',
+                'fileModificationDate', 'includedFiles', 'briefcase']);
+        }
+
+        return $fields;
+    }
+
+    protected function reorderFields(iterable $inputFields, $orderArray)
+    {
+        $keys = array_map(fn ($field) => $field->getAsDto()->getProperty(), $inputFields);
+        $assoc = array_combine($keys, $inputFields);
+
+        $outputFields = [];
+        foreach ($orderArray as $fieldName) {
+            $outputFields[$fieldName] = $assoc[$fieldName];
+        }
+
+        $extraFields = array_diff_key($outputFields, $inputFields);
+        $outputFields = array_merge($outputFields, $extraFields);
+
+        return $outputFields;
     }
 
     public function configureActions(Actions $actions): Actions
@@ -89,11 +104,13 @@ class DocumentCrudController extends AbstractCrudController
             })
             ->renderAsLink();
 
+        $actions->update(Crud::PAGE_INDEX, Action::DELETE, fn (Action $action) => $action->addCssClass('btn-secondary'));
+
         return $actions
             ->add(Crud::PAGE_INDEX, $copyLink)
             ->add(Crud::PAGE_EDIT, $copyLink)
             ->add(Crud::PAGE_DETAIL, $copyLink)
-            ;
+        ;
     }
 
     public function createEntity(string $entityFqcn): object
@@ -101,6 +118,7 @@ class DocumentCrudController extends AbstractCrudController
         $entity = new Document();
         $entity->setCreationDate(new \DateTimeImmutable());
         $entity->setFileModificationDate(new \DateTimeImmutable());
+
         return $entity;
     }
 
@@ -123,5 +141,4 @@ class DocumentCrudController extends AbstractCrudController
 
         return $url;
     }*/
-
 }

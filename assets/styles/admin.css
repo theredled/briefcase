@@ -6,5 +6,6 @@
 .hidden {display: none}
 .ea-index .content-wrapper {padding: 0}
 .ea-index .content-header {padding: 2em 2em 1em}
-.ea-index .datagrid .actions .btn {/*display: inline-block*/ margin-inline-start: 0!important}
+.ea-index .datagrid .actions .btn {/*display: inline-block*/ margin-inline-start: 0!important;     padding: 0 8px;}
 .ea-index .datagrid .actions .btn-label {display: none}
+.ea-index .datagrid .actions { white-space: nowrap;}
