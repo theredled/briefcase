@@ -1,0 +1,33 @@
+{% set show_user_menu = false %}
+
+{% extends 'base.html.twig' %}
+
+
+{% block body %}
+    <section class="section-block page-section" id="expired-link">
+        <!--div class="section-h2">
+            <h2>
+                Téléchargements
+            </h2>
+        </div-->
+        <div class="section-content">
+            <h2 class="section-h2">
+                <i class="fa fa-link" ></i>
+                <i class="far fa-clock" style="margin-right: 2vw"></i>
+                Lien expiré
+                <i class="fa fa-clock" style="margin-left: 2vw"></i>
+                <i class="fa fa-link" ></i>
+            </h2>
+            <div class="restrained-text">
+                <h3>Le lien auquel vous voulez accéder n'est plus valide</h3>
+
+                <p>
+                    Pour des raisons de sécurité, le lien auquel vous voulez accéder possède durée de vie limité et celle-ci est expirée.
+                </p>
+                <p>
+                    Pour recevoir à nouveau le contenu, veuillez contacter directement l’expéditeur.
+                </p>
+            </div>
+        </div>
+    </section>
+{% endblock %}

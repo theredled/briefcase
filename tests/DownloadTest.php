@@ -40,12 +40,11 @@ class DownloadTest extends AbstractTest
     public function testSensibleDoc(): void
     {
         $uri = '/d/rib-bg';
-        try {
-            $crawler = $this->client->request('GET', $uri);
-            $this->fail();
-        } catch (AccessDeniedHttpException $e) {
-            $this->assertTrue(true);
-        }
+
+        $crawler = $this->client->request('GET', $uri);
+        $this->assertResponseStatusCodeSame(410);
+        $this->assertAnySelectorTextContains('h2', 'Lien expiré');
+
         $absoluteUri = $this->client->getRequest()->getUri();
         // $this->assertResponseStatusCodeSame(403);
         /** @var UriSigner $uriSigner */

@@ -12,16 +12,19 @@ namespace App\Controller;
 use App\Entity\Briefcase;
 use App\Entity\Document;
 use App\Entity\Download;
+use App\Exception\LinkExpiredException;
 use App\Services\DownloadService;
 use Bg\MiscBundle\Helper\Url;
 use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\HttpFoundation\File\Exception\AccessDeniedException;
 use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Core\Signature\Exception\ExpiredSignatureException;
 use Vich\UploaderBundle\Form\Type\VichFileType;
 
 class DownloadController extends BaseController
@@ -85,20 +88,27 @@ class DownloadController extends BaseController
     {
         $lang = $this->getLang($request);
 
-        $document = $this->downloadService->findEntityOrFail($token, $lang, $request);
+        try {
+            $document = $this->downloadService->findEntityOrFail($token, $lang, $request);
+        } catch (LinkExpiredException $e) {
+            //throw new ExpiredSignatureException($e->getMessage(), 419, $e);
+            //throw new AccessDeniedException($e->getMessage());
+            //throw $this->createAccessDeniedException($e->getMessage(), $e);
+            return $this->render('expired.html.twig', [], new Response(null, Response::HTTP_GONE));
+        }
+
 
         if ($request->query->get('dl') or $request->query->get('inline')) {
             $this->registerDownload($document, $request);
 
-            if ($document->isFolder()) {
-                return $this->dlFolder($document);
-            }
+                if ($document->isFolder()) {
+                    return $this->dlFolder($document);
+                }
 
-            return $this->dlItem($document, $request);
-
-            // -- Pour preview réseaux sociaux/chat
+                return $this->dlItem($document, $request);
         }
 
+        // -- Pour preview réseaux sociaux/chat
         return $this->render('main/dlPreview.html.twig', [
             'item' => $document,
             'dl_url' => Url::changeUrlParams($request->getUri(), ['dl' => 1]),
