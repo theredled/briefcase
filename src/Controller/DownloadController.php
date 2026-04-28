@@ -43,6 +43,7 @@ class DownloadController extends BaseController
             ->add('file', VichFileType::class, [
                 'download_uri' => 'foo',
                 //'download_label' => fn($doc) => 'bar'
+                'download_label' => 'test label'
             ]);
 
         return $this->render('testForm.html.twig', [
